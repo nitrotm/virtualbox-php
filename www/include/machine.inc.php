@@ -231,6 +231,8 @@ class Machine extends AbstractObject {
 			return ($this->get('/cem/ready', 'false') == 'true');
 		case 'product':
 			return $this->get('/VirtualBox/GuestInfo/OS/Product');
+		case 'additions':
+			return ($this->get('/VirtualBox/GuestAdd/Version').'-'.$this->get('/VirtualBox/GuestAdd/Revision'));
 		case 'os':
 			return Repository::getOs($this->get('ostype'));
 		}

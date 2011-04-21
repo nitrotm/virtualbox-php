@@ -468,6 +468,12 @@ foreach (Machine::$vm as $name) {
 ?>
 						</td>
 					</tr>
+					<tr>
+						<th>Guest Additions</th>
+						<td>
+							<?=$machine->additions?>
+						</td>
+					</tr>
 					<!--tr>
 						<th>Path</th>
 						<td><?=$machine->path?></td>
