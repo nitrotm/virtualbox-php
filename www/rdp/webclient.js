@@ -56,7 +56,7 @@ var RDPWebClient = {
                 window.addEventListener("contextmenu", function(event) { return RDPWebClient._MozillaContextMenu(event); }, true);
                 window.addEventListener("mousedown", function(event) { return RDPWebClient._MozillaMouse(event, true); }, true);
                 window.addEventListener("mouseup", function(event) { return RDPWebClient._MozillaMouse(event, false); }, true);
-                flash.addEventListener("mouseout", function(event) { return RDPWebClient._MozillaMouseOut(); }, true);
+                flash.addEventListener("mouseout", function(event) { return RDPWebClient._MozillaMouseOut(event); }, true);
             }
             else
             {
@@ -117,7 +117,7 @@ var RDPWebClient = {
             }
         }
     },
-    _MozillaMouseOut: function()
+    _MozillaMouseOut: function(event)
     {
         if (RDPWebClient.isRDPWebControlById(event.target.id))
         {
