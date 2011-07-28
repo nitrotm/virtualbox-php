@@ -210,8 +210,8 @@ static const char * networkAttachmentTypeConverter(PRUint32 value) {
 		return "intnet";
 	case NetworkAttachmentType_HostOnly:
 		return "hostonly";
-	case NetworkAttachmentType_VDE:
-		return "vde";
+	case NetworkAttachmentType_Generic:
+		return "generic";
 	}
 	return "unknown";
 }
@@ -408,6 +408,7 @@ static void exportVirtualBoxMediumAttachment(IMediumAttachment *mediumAttachment
  */
 static void exportVirtualBoxNetworkAdapter(INetworkAdapter *networkAdapter, PRUint32 index, xmlTextWriterPtr writer) {
 	char name[256];
+	nsresult rc;
 
 	// find info
 	PRUint32 attachmentType = 0;
@@ -418,30 +419,7 @@ static void exportVirtualBoxNetworkAdapter(INetworkAdapter *networkAdapter, PRUi
 	sprintf(name, "nic%d", index);
 	ADDXMLENUM(networkAdapter->GetAttachmentType, name, networkAttachmentTypeConverter);
 
-	switch (attachmentType) {
-	case NetworkAttachmentType_NAT:
-	case NetworkAttachmentType_Bridged:
-	case NetworkAttachmentType_Internal:
-	case NetworkAttachmentType_HostOnly:
-	case NetworkAttachmentType_VDE:
-		// adapter type
-		sprintf(name, "nictype%d", index);
-		ADDXMLENUM(networkAdapter->GetAdapterType, name, networkAdapterTypeConverter);
-
-		// mac address
-		sprintf(name, "macaddress%d", index);
-		ADDXMLSTRING(networkAdapter->GetMACAddress, name);
-
-		// cable connected
-		sprintf(name, "cableconnected%d", index);
-		ADDXMLBOOL(networkAdapter->GetCableConnected, name);
-
-		// speed
-//		sprintf(name, "nicspeed%d", index);
-//		ADDXMLINT32U(networkAdapter->GetLineSpeed, name);
-		break;
-	}
-
+	// specific configuration
 	switch (attachmentType) {
 	case NetworkAttachmentType_NAT:
 		// nat network
@@ -450,9 +428,9 @@ static void exportVirtualBoxNetworkAdapter(INetworkAdapter *networkAdapter, PRUi
 		break;
 
 	case NetworkAttachmentType_Bridged:
-		// host adapter
+		// bridge adapter
 		sprintf(name, "bridgeadapter%d", index);
-		ADDXMLSTRING(networkAdapter->GetHostInterface, name);
+		ADDXMLSTRING(networkAdapter->GetBridgedInterface, name);
 		break;
 
 	case NetworkAttachmentType_Internal:
@@ -464,14 +442,64 @@ static void exportVirtualBoxNetworkAdapter(INetworkAdapter *networkAdapter, PRUi
 	case NetworkAttachmentType_HostOnly:
 		// host adapter
 		sprintf(name, "hostonlyadapter%d", index);
-		ADDXMLSTRING(networkAdapter->GetHostInterface, name);
+		ADDXMLSTRING(networkAdapter->GetHostOnlyInterface, name);
+		break;
+	}
+
+	switch (attachmentType) {
+	case NetworkAttachmentType_NAT:
+	case NetworkAttachmentType_Bridged:
+	case NetworkAttachmentType_Internal:
+	case NetworkAttachmentType_HostOnly:
+	case NetworkAttachmentType_Generic:
+		// enabled
+		sprintf(name, "nicenabled%d", index);
+		ADDXMLBOOL(networkAdapter->GetEnabled, name);
+	
+		// enabled
+		sprintf(name, "nicpriority%d", index);
+		ADDXMLINT32U(networkAdapter->GetBootPriority, name);
+	
+		// adapter type
+		sprintf(name, "nictype%d", index);
+		ADDXMLENUM(networkAdapter->GetAdapterType, name, networkAdapterTypeConverter);
+	
+		// mac address
+		sprintf(name, "macaddress%d", index);
+		ADDXMLSTRING(networkAdapter->GetMACAddress, name);
+	
+		// cable connected
+		sprintf(name, "cableconnected%d", index);
+		ADDXMLBOOL(networkAdapter->GetCableConnected, name);
+	
+		// speed
+		sprintf(name, "nicspeed%d", index);
+		ADDXMLINT32U(networkAdapter->GetLineSpeed, name);
 		break;
 
-	case NetworkAttachmentType_VDE:
-		// vde network
-		sprintf(name, "vde%d", index);
-		ADDXMLSTRING(networkAdapter->GetVDENetwork, name);
-		break;
+		// extra properties
+		{
+			PRUnichar **propertyNames = nsnull;
+			PRUnichar **propertyValues = nsnull;
+			PRUint32 propertyNamesCount = 0;
+			PRUint32 propertyValuesCount = 0;
+		
+			sprintf(name, "nic%d_", index);
+		
+			rc = networkAdapter->GetProperties(NS_LITERAL_STRING("").get(), &propertyNamesCount, &propertyNames, &propertyValuesCount, &propertyValues);
+			if (NS_SUCCEEDED(rc)) {
+				for (PRUint32 i = 0; i < propertyNamesCount && i < propertyValuesCount; i++) {
+					nsCAutoString key(name);
+					nsString value(propertyValues[i]);
+		
+					key.AppendWithConversion(propertyNames[i]);
+					WRITEXMLSTRING(convertString(key).c_str(), convertString(value));
+				}
+		
+				NS_FREE_XPCOM_ALLOCATED_POINTER_ARRAY(propertyNamesCount, propertyNames);
+				NS_FREE_XPCOM_ALLOCATED_POINTER_ARRAY(propertyValuesCount, propertyValues);
+			}
+		}
 	}
 }
 
@@ -824,15 +852,19 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 			// network adapters
 			{
 				PRUint32 networkAdaptersCount;
-	
-				rc = systemProperties->GetNetworkAdapterCount(&networkAdaptersCount);
-				if (NS_SUCCEEDED(rc)) {
-					for (PRUint32 i = 0; i < networkAdaptersCount; i++) {
-						nsCOMPtr<INetworkAdapter> networkAdapter;
+				PRUint32 chipsetType;
 
-						rc = machine->GetNetworkAdapter(i, getter_AddRefs(networkAdapter));
-						if (NS_SUCCEEDED(rc)) {
-							exportVirtualBoxNetworkAdapter(networkAdapter, i + 1, writer);
+				rc = machine->GetChipsetType(&chipsetType);
+				if (NS_SUCCEEDED(rc)) {
+					rc = systemProperties->GetMaxNetworkAdapters(chipsetType, &networkAdaptersCount);
+					if (NS_SUCCEEDED(rc)) {
+						for (PRUint32 i = 0; i < networkAdaptersCount; i++) {
+							nsCOMPtr<INetworkAdapter> networkAdapter;
+	
+							rc = machine->GetNetworkAdapter(i, getter_AddRefs(networkAdapter));
+							if (NS_SUCCEEDED(rc)) {
+								exportVirtualBoxNetworkAdapter(networkAdapter, i + 1, writer);
+							}
 						}
 					}
 				}

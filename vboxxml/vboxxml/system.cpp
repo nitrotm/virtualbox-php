@@ -64,6 +64,8 @@ void exportVirtualBoxOSTypes(IVirtualBox *virtualBox, xmlTextWriterPtr writer) {
 }
 
 void exportVirtualBoxSystem(IVirtualBox *virtualBox, xmlTextWriterPtr writer) {
+	nsresult rc;
+
 	xmlTextWriterStartElement(writer, TOXMLCHAR("system"));
 
 		// version
@@ -103,7 +105,18 @@ void exportVirtualBoxSystem(IVirtualBox *virtualBox, xmlTextWriterPtr writer) {
 				ADDXMLINT32U(systemProperties->GetMaxGuestMonitors, "maxguestmonitors");
 
 				// network adapter count
-				ADDXMLINT32U(systemProperties->GetNetworkAdapterCount, "networkadapters");
+				{
+					PRUint32 networkAdaptersCount;
+
+					rc = systemProperties->GetMaxNetworkAdapters(ChipsetType_PIIX3, &networkAdaptersCount);
+					if (NS_SUCCEEDED(rc)) {
+						WRITEXMLINT32("networkadapters_PIIX3", networkAdaptersCount);
+					}
+					rc = systemProperties->GetMaxNetworkAdapters(ChipsetType_ICH9, &networkAdaptersCount);
+					if (NS_SUCCEEDED(rc)) {
+						WRITEXMLINT32("networkadapters_ICH9", networkAdaptersCount);
+					}
+				}
 
 				// serial port count
 				ADDXMLINT32U(systemProperties->GetSerialPortCount, "serialports");

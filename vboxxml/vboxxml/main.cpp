@@ -21,7 +21,7 @@ public:
 static void registerMedium(IVirtualBox *virtualBox, const string &path, PRUint32 type, PRUint32 access, nsCOMPtr<IMedium> &medium) {
 	virtualBox->FindMedium(NS_ConvertUTF8toUTF16(nsCString(path.c_str())).get(), type, getter_AddRefs(medium));
 	if (medium == nsnull) {
-		virtualBox->OpenMedium(NS_ConvertUTF8toUTF16(nsCString(path.c_str())).get(), type, access, getter_AddRefs(medium));
+		virtualBox->OpenMedium(NS_ConvertUTF8toUTF16(nsCString(path.c_str())).get(), type, access, PR_FALSE, getter_AddRefs(medium));
 	}
 }
 
