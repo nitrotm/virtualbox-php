@@ -86,6 +86,17 @@ case 'set':
 	}
 
 	if ($machine->state == 'poweroff') {
+		// network
+		foreach (arrayParam('net') as $net) {
+			$machine->$net = array(
+				'type' => stringParam($net.'_type', 'none'),
+				'driver' => '82543GC',
+				'mac' => str_replace(':', '', stringParam($net.'_mac', 'auto')),
+				'adapter' => stringParam($net.'_adapter', FALSE),
+				'connected' => 'on'
+			);
+		}
+
 		// options
 		$values = array(
 			'name' => stringParam('name', 'vbox-'.time()),
@@ -393,29 +404,53 @@ for ($i = 0; $i < 30; $i++) {
 <?
 	}
 }
-if ($machine->state != 'poweroff' && $machine->ready) {
-	$nic = $machine->nic0;
-	$net = $machine->net0;
+for ($i = 0; $i < 8; $i++) {
+	$slot = 'nic'.$i;
+	$nic = $machine->$slot;
+	if ($nic['type'] == 'none') {
+		continue;
+	}
 ?>
 					<tr>
-						<th>NET-0</th>
+						<th>NET-<?=$i?></th>
 						<td>
+							<input type="hidden" name="net[]" value="<?=$slot?>"/>
+<?php
+	if ($machine->state != 'poweroff') {
+		if ($machine->ready) {
+			$slot2 = 'net'.$i;
+			$net = $machine->$slot2;
+?>
+							mac: <?=$nic['mactext']?><br/>
 							address: <?=$net['ip']?> / <?=$net['netmask']?><br/>
 							broadcast: <?=$net['broadcast']?><br/>
-							mac: <?=$nic['mactext']?>
-						</td>
-					</tr>
-<?
-} else {
-	$nic = $machine->nic0;
+<?php
+		} else {
 ?>
-					<tr>
-						<th>NET-0</th>
-						<td>
-							mac: <?=$nic['mactext']?>
+							mac: <?=$nic['mactext']?><br/>
+<?php
+		}
+	} else {
+?>
+							type: <select name="<?=$slot?>_type">
+<?php
+		foreach (array('bridged' => 'Bridged', 'hostonly' => 'Host-only') as $key => $value) {
+			if ($key == $nic['type']) {
+				?><option value="<?=$key?>" selected=""><?=$value?></option><?php
+			} else {
+				?><option value="<?=$key?>"><?=$value?></option><?php
+			}
+		}
+?>
+							</select><br/><br/>
+							mac: <input type="text" name="<?=$slot?>_mac" value="<?=$nic['mactext']?>"/><br/>
+							adapter: <input type="text" name="<?=$slot?>_adapter" value="<?=$nic['adapter']?>"/><br/>
+<?php
+	}
+?>
 						</td>
 					</tr>
-<?
+<?php
 }
 ?>
 					<tr>

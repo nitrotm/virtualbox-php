@@ -100,7 +100,12 @@ if (stringParam('op') == 'create') {
 		}
 
 		// set nic
-		$machine->nic0 = array('type' => 'bridged', 'driver' => '82543GC', 'adapter' => 'eth0', 'connected' => 'on');
+		$machine->nic0 = array(
+			'type' => 'bridged',
+			'driver' => '82543GC',
+			'adapter' => 'eth0',
+			'connected' => 'on'
+		);
 
 		header('Location: machine.php?machine='.$machine->id);
 		exit;
