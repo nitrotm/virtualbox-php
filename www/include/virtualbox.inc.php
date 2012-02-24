@@ -12,11 +12,12 @@ require_once('machine.inc.php');
 
 class Repository {
 	private static $system = array();
-	private static $oses = array();	
-	private static $dvds = array();	
-	private static $fdds = array();	
-	private static $hdds = array();	
-	private static $machines = array();	
+	private static $oses = array();
+	private static $dvds = array();
+	private static $fdds = array();
+	private static $hdds = array();
+	private static $machines = array();
+	private static $ovfs = array();
 
 
 	public static function getSystem($key) {
@@ -175,6 +176,11 @@ class Repository {
 	}
 
 
+	public static function listOVFs() {
+		return array_values(self::$ovfs);
+	}
+
+
 	public static function refresh() {
 		list($system, $oses, $dvds, $fdds, $hdds, $machines) = self::visit(
 			new SimpleXMLElement(captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH)))
@@ -211,15 +217,27 @@ class Repository {
 			self::$machines[$machine->id] = $machine;
 		}
 		uasort(self::$machines, array('Repository', 'sortByName'));
+
+		self::$ovfs = array();
+		$path = BASE_PATH.'/ovf';
+		if (is_dir($path) && ($dh = opendir($path)) !== FALSE) {
+			while (($item = readdir($dh)) !== FALSE) {
+				if (is_file($path.'/'.$item) && strrpos($item, '.ovf') === strlen($item) - strlen('.ovf')) {
+					self::$ovfs[] = $item;
+				}
+			}
+			closedir($dh);
+		}
+		sort(self::$ovfs);
 		return TRUE;
 	}
 
 	public static function visit($xml) {
 		$system = array();
-		$oses = array();	
-		$dvds = array();	
-		$fdds = array();	
-		$hdds = array();	
+		$oses = array();
+		$dvds = array();
+		$fdds = array();
+		$hdds = array();
 		$machines = array();
 		foreach ($xml->children() as $node) {
 			switch ($node->getName()) {

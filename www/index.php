@@ -319,6 +319,35 @@ foreach (Repository::listHdds() as $hdd) {
 				</table>
 			</form>
 		</div>
+
+		<!-- Import machine -->
+		<div class="content">
+			<div class="title">IMPORT MACHINE</div>
+<?
+if (sizeof(Repository::listOVFs()) > 0) {
+?>
+			<table cellspacing="0">
+				<tr class="title">
+					<th>Name</th>
+				</tr>
+<?
+	foreach (Repository::listOVFs() as $ovf) {
+?>
+				<tr>
+					<td><?=$ovf?><!-- [<a href="?op=import&ovf=<?=$ovf?>">import</a>] --></td>
+				</tr>
+<?
+	}
+?>
+			</table>
+<?
+} else {
+?>
+			No machine available.
+<?
+}
+?>
+		</div>
 <?
 
 include('include/footer.inc.php');

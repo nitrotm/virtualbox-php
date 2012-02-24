@@ -12,29 +12,39 @@ if (!$machine || !$machine->exists()) {
 // perform actions
 switch (stringParam('op')) {
 case 'boot':
-	$machine->boot('headless');
-	header('Location: machine.php?machine='.$machine->id);
-	exit;
+	if ($machine->boot('headless')) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
+	break;
 
 case 'pause':
-	$machine->pause();
-	header('Location: machine.php?machine='.$machine->id);
-	exit;
+	if ($machine->pause()) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
+	break;
 
 case 'resume':
-	$machine->resume();
-	header('Location: machine.php?machine='.$machine->id);
-	exit;
+	if ($machine->resume()) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
+	break;
 
 case 'reboot':
-	$machine->reset();
-	header('Location: machine.php?machine='.$machine->id);
-	exit;
+	if ($machine->reset()) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
+	break;
 
 case 'poweroff':
-	$machine->poweroff();
-	header('Location: machine.php?machine='.$machine->id);
-	exit;
+	if ($machine->poweroff()) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
+	break;
 
 case 'destroy':
 	for ($i = 0; $i < 2; $i++) {
@@ -62,9 +72,10 @@ case 'destroy':
 			}
 		}
 	}
-	$machine->destroy();
-	header('Location: index.php');
-	exit;
+	if ($machine->destroy()) {
+		header('Location: index.php');
+		exit;
+	}
 
 case 'set':
 	// mount
@@ -115,6 +126,13 @@ case 'set':
 	}
 	break;
 
+case 'export':
+	if ($machine->export()) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
+	break;
+
 case 'extract':
 	$slot = stringParam('slot');
 	$hdd = $machine->$slot;
@@ -157,6 +175,7 @@ case 'poweroff':
 case 'aborted':
 ?>
 							<a href="machine.php?machine=<?=$machine->id?>&op=boot">boot</a>
+							<a href="machine.php?machine=<?=$machine->id?>&op=export">export</a>
 							<a href="machine.php?machine=<?=$machine->id?>&op=destroy" onclick="return confirm(&quot;Are you sure you want to destroy this machine?&quot;);">destroy</a>
 <?
 	break;

@@ -244,6 +244,13 @@ class Machine extends AbstractObject {
 		return (strlen($this->path) > 0 && file_exists($this->path));
 	}
 
+	public function export() {
+		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'export', $this->id, '--output', BASE_PATH.'/ovf/'.$this->id.'.ovf')) == 0) {
+			return TRUE;
+		}
+		return FALSE;
+	}
+
 	public function boot($mode = 'headless') {
 		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'startvm', $this->id, '--type', $mode)) == 0) {
 			$this->loaded = FALSE;

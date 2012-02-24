@@ -9,6 +9,7 @@
  *      /var/lib/virtualbox/fdd
  *      /var/lib/virtualbox/hdd
  *      /var/lib/virtualbox/machine
+ *      /var/lib/virtualbox/ovf
  *
  * - Change ownership to web server user/group
  *
@@ -16,6 +17,7 @@
  * - Install IMG floppy images in fdd/ sub-folder
  * - Install VDi hdd images in hdd/ sub-folder
  * - Install machines in machine/ sub-folder
+ * - Install OVF machines in ovf/ sub-folder
  */
 
 define('VIRTUALBOX_PATH',			'/usr/lib/virtualbox');
