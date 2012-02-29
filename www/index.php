@@ -120,6 +120,7 @@ foreach (Repository::listMachines() as $machine) {
 	case 'starting':
 	case 'running':
 	case 'paused':
+	case 'saved':
 		$running[] = $machine;
 		break;
 

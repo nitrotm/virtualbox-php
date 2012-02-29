@@ -267,6 +267,14 @@ class Machine extends AbstractObject {
 		return FALSE;
 	}
 
+	public function freeze() {
+		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'controlvm', $this->id, 'savestate')) == 0) {
+			$this->loaded = FALSE;
+			return TRUE;
+		}
+		return FALSE;
+	}
+
 	public function resume() {
 		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'controlvm', $this->id, 'resume')) == 0) {
 			$this->loaded = FALSE;

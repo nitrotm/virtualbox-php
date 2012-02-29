@@ -25,6 +25,13 @@ case 'pause':
 	}
 	break;
 
+case 'freeze':
+	if ($machine->freeze()) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
+	break;
+
 case 'resume':
 	if ($machine->resume()) {
 		header('Location: machine.php?machine='.$machine->id);
@@ -173,6 +180,7 @@ include('include/header.inc.php');
 switch ($machine->state) {
 case 'poweroff':
 case 'aborted':
+case 'saved':
 ?>
 							<a href="machine.php?machine=<?=$machine->id?>&op=boot">boot</a>
 							<a href="machine.php?machine=<?=$machine->id?>&op=export">export</a>
@@ -196,6 +204,7 @@ case 'running':
 	}
 ?>
 							<a href="machine.php?machine=<?=$machine->id?>&op=pause">pause</a>
+							<a href="machine.php?machine=<?=$machine->id?>&op=freeze">freeze</a>
 							<a href="machine.php?machine=<?=$machine->id?>&op=reboot">reboot</a>
 							<a href="machine.php?machine=<?=$machine->id?>&op=poweroff">poweroff</a>
 <?
