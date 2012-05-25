@@ -571,7 +571,9 @@ if ($machine->state == 'running' && $machine->vrde) {
 		<div class="content">
 			<div class="title">VRD CONSOLE</div>
 			<div class="console">
-				<a href="#" onclick="return RDPWebCTRLALTDEL('rdpwidget');">Send Ctrl.+Alt.+Del.</a>
+				<a href="#" onclick="return RDPWebSCAN('rdpwidget', '1d 2e ae 9d');">Ctrl.+C</a>
+				<a href="#" onclick="return RDPWebSCAN('rdpwidget', '1d 2d ad 9d');">Ctrl.+X</a>
+				<a href="#" onclick="return RDPWebCTRLALTDEL('rdpwidget');">Ctrl.+Alt.+Del.</a>
 				<div id="rdpwidgetContainer"><div id="rdpwidget"></div></div>
 			</div>
 		</div>
@@ -611,6 +613,15 @@ if ($machine->state == 'running' && $machine->vrde) {
 				}
 				return false;
 			}
+
+                        function RDPWebSCAN(rdpId, codes) {
+                                var rdp = RDPWebClient.getFlashById('rdpwidget');
+
+                                if (rdp) {
+                                        rdp.keyboardSendScancodes(codes);
+                                }
+                                return false;
+                        }
 
 			RDPWebClient.embedSWF ('rdp/RDPClientUI.swf', 'rdpwidget');
 
