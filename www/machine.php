@@ -140,6 +140,72 @@ case 'export':
 	}
 	break;
 
+case 'adddisk':
+	$slot = NULL;
+	if (stringParam('disktype') == 'sata') {
+		for ($i = 0; $i < 30; $i++) {
+			$key = 'sata'.$i;
+			if (!$machine->$key) {
+				$slot = $key;
+				break;
+			}
+		}
+	} else {
+		for ($i = 0; $i < 4; $i++) {
+			$key = 'ide'.$i;
+			if (!$machine->$key) {
+				$slot = $key;
+				break;
+			}
+		}
+	}
+	if ($slot != NULL) {
+		// set hdd
+		switch (stringParam('disksource')) {
+		case 'new':
+			$machine->$slot = Repository::createHdd(intParam('disk', 8192));
+			break;
+
+		case 'clone':
+			$hdd = hddParam('hdd');
+			if ($hdd && $hdd->exists()) {
+				$machine->$slot = $hdd->duplicate();
+			}
+			break;
+
+		case 'differencial':
+			$hdd = hddParam('hdd');
+			if ($hdd && $hdd->exists()) {
+				if ($hdd->type == 'multiattach') {
+					$machine->$slot = $hdd;
+					$machine->$slot->autoreset = FALSE;
+				} else {
+					$machine->$slot = $hdd->duplicate();
+				}
+			}
+			break;
+
+		case 'volatile':
+			$hdd = hddParam('hdd');
+			if ($hdd && $hdd->exists()) {
+				if ($hdd->type == 'multiattach') {
+					$machine->$slot = $hdd;
+					$machine->$slot->autoreset = TRUE;
+				} else {
+					$machine->$slot = $hdd->duplicate();
+				}
+			}
+			break;
+		}
+		$machine->$slot = Repository::createHdd(intParam('disk', 8192));
+	}
+	break;
+
+case 'removedisk':
+	$slot = stringParam('slot');
+	$machine->$slot = NULL;
+	break;
+
 case 'extract':
 	$slot = stringParam('slot');
 	$hdd = $machine->$slot;
@@ -367,6 +433,7 @@ for ($i = 0; $i < 4; $i++) {
 			} else {
 				?> [<a href="machine.php?machine=<?=$machine->id?>&op=compact&slot=<?=$slot?>">compact</a>]<?
 			}
+			?> [<a href="machine.php?machine=<?=$machine->id?>&op=removedisk&slot=<?=$slot?>">remove</a>]<?
 		}
 ?>
 						</th>
@@ -416,6 +483,9 @@ for ($i = 0; $i < 30; $i++) {
 				?> [<a href="machine.php?machine=<?=$machine->id?>&op=extract&slot=<?=$slot?>">extract</a>]<?
 			} else {
 				?> [<a href="machine.php?machine=<?=$machine->id?>&op=compact&slot=<?=$slot?>">compact</a>]<?
+			}
+			if ($slot != 'sata0') {
+				?> [<a href="machine.php?machine=<?=$machine->id?>&op=removedisk&slot=<?=$slot?>">remove</a>]<?
 			}
 		}
 ?>
@@ -627,6 +697,63 @@ if ($machine->state == 'running' && $machine->vrde) {
 
 		</script>
 <?
+}
+if ($machine->state == 'poweroff') {
+?>
+		<!-- Machine disks -->
+		<div class="content">
+			<div class="title">ADD DISK:</div>
+			<form method="POST">
+				<input type="hidden" name="machine" value="<?=$machine->id?>"/>
+				<input type="hidden" name="op" value="adddisk"/>
+				<table cellspacing="0">
+					<tr>
+						<th>HDD</th>
+						<td>
+							<input type="radio" name="disktype" value="ide" <?=stringParam('disktype') == 'ide' ? 'checked=""' : ''?>/>IDE<br/>
+							<input type="radio" name="disktype" value="sata" <?=stringParam('disktype') == '' || stringParam('disktype') == 'sata' ? 'checked=""' : ''?>/>SATA
+						</td>
+					</tr>
+					<tr>
+						<th>HDD Source</th>
+						<td>
+							<input type="radio" name="disksource" value="new" <?=stringParam('disksource') == 'new' ? 'checked=""' : ''?>/>new
+							<input type="text" name="disk" value="<?=intParam('disk', 8192)?>"/> [mb]<br/><br/>
+
+							<input type="radio" name="disksource" value="clone" <?=stringParam('disksource') == 'clone' ? 'checked=""' : ''?>/>clone
+							<input type="radio" name="disksource" value="differencial" <?=stringParam('disksource') == '' || stringParam('disksource') == 'differencial' ? 'checked=""' : ''?>/>differencial
+							<input type="radio" name="disksource" value="volatile" <?=stringParam('disksource') == 'volatile' ? 'checked=""' : ''?>/>volatile
+							<select name="hdd">
+<?
+$lastHdd = NULL;
+foreach (Repository::listHdds() as $hdd) {
+	if ($hdd->type == 'multiattach' && ($lastHdd == NULL || $lastHdd->time <= $hdd->time)) {
+		$lastHdd = $hdd;
+	}
+}
+foreach (Repository::listHdds() as $hdd) {
+	if ($hdd->type == 'multiattach') {
+		$selected = stringParam('hdd') == $hdd->path;
+		if (strlen(stringParam('hdd')) == 0) {
+			$selected = $hdd->path == $lastHdd->path;
+		}
+?>
+								<option value="<?=$hdd->path?>" <?=$selected ? 'selected=""' : ''?>><?=$hdd->name?></option>
+<?
+	}
+}
+?>
+							</select>
+						</td>
+					</tr>
+					<tr class="action">
+						<td colspan="2"><input type="submit" value="add"/></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+<?
+
 }
 
 include('include/footer.inc.php');

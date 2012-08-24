@@ -22,43 +22,31 @@ if (stringParam('op') == 'create') {
 		);
 
 		// set hdd
+		if (stringParam('disktype') == 'sata') {
+			$slot = 'sata0';
+		} else {
+			$slot = 'ide0';
+		}
 		switch (stringParam('disksource')) {
 		case 'new':
-			if (stringParam('disktype') == 'sata') {
-				$machine->sata0 = Repository::createHdd(intParam('disk', 8192));
-			} else {
-				$machine->ide0 = Repository::createHdd(intParam('disk', 8192));
-			}
+			$machine->$slot = Repository::createHdd(intParam('disk', 8192));
 			break;
 
 		case 'clone':
 			$hdd = hddParam('hdd');
 			if ($hdd && $hdd->exists()) {
-				if (stringParam('disktype') == 'sata') {
-					$machine->sata0 = $hdd->duplicate();
-				} else {
-					$machine->ide0 = $hdd->duplicate();
-				}
+				$machine->$slot = $hdd->duplicate();
 			}
 			break;
 
 		case 'differencial':
 			$hdd = hddParam('hdd');
 			if ($hdd && $hdd->exists()) {
-				if (stringParam('disktype') == 'sata') {
-					if ($hdd->type == 'multiattach') {
-						$machine->sata0 = $hdd;
-						$machine->sata0->autoreset = FALSE;
-					} else {
-						$machine->sata0 = $hdd->duplicate();
-					}
+				if ($hdd->type == 'multiattach') {
+					$machine->$slot = $hdd;
+					$machine->$slot->autoreset = FALSE;
 				} else {
-					if ($hdd->type == 'multiattach') {
-						$machine->ide0 = $hdd;
-						$machine->ide0->autoreset = FALSE;
-					} else {
-						$machine->ide0 = $hdd->duplicate();
-					}
+					$machine->$slot = $hdd->duplicate();
 				}
 			}
 			break;
@@ -66,20 +54,11 @@ if (stringParam('op') == 'create') {
 		case 'volatile':
 			$hdd = hddParam('hdd');
 			if ($hdd && $hdd->exists()) {
-				if (stringParam('disktype') == 'sata') {
-					if ($hdd->type == 'multiattach') {
-						$machine->sata0 = $hdd;
-						$machine->sata0->autoreset = TRUE;
-					} else {
-						$machine->sata0 = $hdd->duplicate();
-					}
+				if ($hdd->type == 'multiattach') {
+					$machine->$slot = $hdd;
+					$machine->$slot->autoreset = TRUE;
 				} else {
-					if ($hdd->type == 'multiattach') {
-						$machine->ide0 = $hdd;
-						$machine->ide0->autoreset = TRUE;
-					} else {
-						$machine->ide0 = $hdd->duplicate();
-					}
+					$machine->$slot = $hdd->duplicate();
 				}
 			}
 			break;
@@ -87,11 +66,12 @@ if (stringParam('op') == 'create') {
 
 		// set dvd
 		if (boolParam('dvdenabled')) {
-			if (stringParam('disktype') == 'sata') {
-				$machine->ide0 = dvdParam('dvd');
+			if ($slot != 'ide0') {
+				$slot = 'ide0';
 			} else {
-				$machine->ide1 = dvdParam('dvd');
+				$slot = 'ide1';
 			}
+			$machine->$slot = dvdParam('dvd');
 		}
 
 		// set fdd
