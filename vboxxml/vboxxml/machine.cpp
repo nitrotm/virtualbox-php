@@ -39,15 +39,15 @@ static const char * chipsetTypeConverter(PRUint32 value) {
  */
 static const char * pointingHidTypeConverter(PRUint32 value) {
 	switch (value) {
-	case PointingHidType_None:
+	case PointingHIDType_None:
 		return "none";
-	case PointingHidType_PS2Mouse:
+	case PointingHIDType_PS2Mouse:
 		return "ps2";
-	case PointingHidType_USBMouse:
+	case PointingHIDType_USBMouse:
 		return "usb";
-	case PointingHidType_USBTablet:
+	case PointingHIDType_USBTablet:
 		return "usbtablet";
-	case PointingHidType_ComboMouse:
+	case PointingHIDType_ComboMouse:
 		return "combo";
 	}
 	return "unknown";
@@ -58,13 +58,13 @@ static const char * pointingHidTypeConverter(PRUint32 value) {
  */
 static const char * keyboardHidTypeConverter(PRUint32 value) {
 	switch (value) {
-	case KeyboardHidType_None:
+	case KeyboardHIDType_None:
 		return "none";
-	case KeyboardHidType_PS2Keyboard:
+	case KeyboardHIDType_PS2Keyboard:
 		return "ps2";
-	case KeyboardHidType_USBKeyboard:
+	case KeyboardHIDType_USBKeyboard:
 		return "usb";
-	case KeyboardHidType_ComboKeyboard:
+	case KeyboardHIDType_ComboKeyboard:
 		return "combo";
 	}
 	return "unknown";
@@ -455,23 +455,23 @@ static void exportVirtualBoxNetworkAdapter(INetworkAdapter *networkAdapter, PRUi
 		// enabled
 		sprintf(name, "nicenabled%d", index);
 		ADDXMLBOOL(networkAdapter->GetEnabled, name);
-	
+
 		// enabled
 		sprintf(name, "nicpriority%d", index);
 		ADDXMLINT32U(networkAdapter->GetBootPriority, name);
-	
+
 		// adapter type
 		sprintf(name, "nictype%d", index);
 		ADDXMLENUM(networkAdapter->GetAdapterType, name, networkAdapterTypeConverter);
-	
+
 		// mac address
 		sprintf(name, "macaddress%d", index);
 		ADDXMLSTRING(networkAdapter->GetMACAddress, name);
-	
+
 		// cable connected
 		sprintf(name, "cableconnected%d", index);
 		ADDXMLBOOL(networkAdapter->GetCableConnected, name);
-	
+
 		// speed
 		sprintf(name, "nicspeed%d", index);
 		ADDXMLINT32U(networkAdapter->GetLineSpeed, name);
@@ -483,19 +483,19 @@ static void exportVirtualBoxNetworkAdapter(INetworkAdapter *networkAdapter, PRUi
 			PRUnichar **propertyValues = nsnull;
 			PRUint32 propertyNamesCount = 0;
 			PRUint32 propertyValuesCount = 0;
-		
+
 			sprintf(name, "nic%d_", index);
-		
+
 			rc = networkAdapter->GetProperties(NS_LITERAL_STRING("").get(), &propertyNamesCount, &propertyNames, &propertyValuesCount, &propertyValues);
 			if (NS_SUCCEEDED(rc)) {
 				for (PRUint32 i = 0; i < propertyNamesCount && i < propertyValuesCount; i++) {
 					nsCAutoString key(name);
 					nsString value(propertyValues[i]);
-		
+
 					key.AppendWithConversion(propertyNames[i]);
 					WRITEXMLSTRING(convertString(key).c_str(), convertString(value));
 				}
-		
+
 				NS_FREE_XPCOM_ALLOCATED_POINTER_ARRAY(propertyNamesCount, propertyNames);
 				NS_FREE_XPCOM_ALLOCATED_POINTER_ARRAY(propertyValuesCount, propertyValues);
 			}
@@ -573,16 +573,16 @@ static void exportVirtualBoxVRDEServer(IVRDEServer *vrdeServer, xmlTextWriterPtr
 	if (enabled == PR_TRUE) {
 		// vrde extpack
 		ADDXMLSTRING(vrdeServer->GetVRDEExtPack, "vrde.ext");
-		
+
 		// vrde auth lib
 		ADDXMLSTRING(vrdeServer->GetAuthLibrary, "vrde.authlib");
 
-		// vrde properties		
+		// vrde properties
 		{
 			PRUnichar **properties = nsnull;
 			PRUint32 propertiesCount = 0;
 			nsAutoString keyPrefix;
-			
+
 			rc = vrdeServer->GetVRDEProperties(&propertiesCount, &properties);
 			if (NS_SUCCEEDED(rc)) {
 				for (PRUint32 i = 0; i < propertiesCount; i++) {
@@ -618,7 +618,7 @@ static void exportVirtualBoxUSBController(IUSBController *usbController, xmlText
 
 	if (enabled == PR_TRUE) {
 		// ehci
-		ADDXMLBOOL(usbController->GetEnabledEhci, "usbehci");
+		ADDXMLBOOL(usbController->GetEnabledEHCI, "usbehci");
 	}
 }
 
@@ -664,7 +664,7 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 			ADDXMLINT32U(machine->GetVRAMSize, "vram");
 
 			// hpet
-			ADDXMLBOOL(machine->GetHpetEnabled, "hpet");
+			ADDXMLBOOL(machine->GetHPETEnabled, "hpet");
 
 			// cpu count
 			ADDXMLINT32U(machine->GetCPUCount, "cpus");
@@ -701,7 +701,7 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 			// boot order
 			{
 				PRUint32 bootPositions;
-	
+
 				rc = systemProperties->GetMaxBootPosition(&bootPositions);
 				if (NS_SUCCEEDED(rc)) {
 					for (PRUint32 i = 1; i <= bootPositions; i++) {
@@ -791,22 +791,22 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 			}
 
 			// io cache
-			ADDXMLBOOL(machine->GetIoCacheEnabled, "iocache");
+			ADDXMLBOOL(machine->GetIOCacheEnabled, "iocache");
 
 			// io cache size
-			ADDXMLINT32U(machine->GetIoCacheSize, "iocachesize");
+			ADDXMLINT32U(machine->GetIOCacheSize, "iocachesize");
 
 			// io cache size (obsolete)
-//			ADDXMLINT32U(machine->GetIoBandwidthMax, "iobandwidth");
+//			ADDXMLINT32U(machine->GetIOBandwidthMax, "iobandwidth");
 
 			// chipset type
 			ADDXMLENUM(machine->GetChipsetType, "chipset", chipsetTypeConverter);
 
 			// pointing hid type
-			ADDXMLENUM(machine->GetPointingHidType, "mouse", pointingHidTypeConverter);
+			ADDXMLENUM(machine->GetPointingHIDType, "mouse", pointingHidTypeConverter);
 
 			// keyboard hid type
-			ADDXMLENUM(machine->GetKeyboardHidType, "keyboard", keyboardHidTypeConverter);
+			ADDXMLENUM(machine->GetKeyboardHIDType, "keyboard", keyboardHidTypeConverter);
 
 			// clipboard mode
 			ADDXMLENUM(machine->GetClipboardMode, "clipboard", clipboardModeConverter);
@@ -860,7 +860,7 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 					if (NS_SUCCEEDED(rc)) {
 						for (PRUint32 i = 0; i < networkAdaptersCount; i++) {
 							nsCOMPtr<INetworkAdapter> networkAdapter;
-	
+
 							rc = machine->GetNetworkAdapter(i, getter_AddRefs(networkAdapter));
 							if (NS_SUCCEEDED(rc)) {
 								exportVirtualBoxNetworkAdapter(networkAdapter, i + 1, writer);

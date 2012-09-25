@@ -19,10 +19,7 @@ public:
  * Register a medium
  */
 static void registerMedium(IVirtualBox *virtualBox, const string &path, PRUint32 type, PRUint32 access, nsCOMPtr<IMedium> &medium) {
-	virtualBox->FindMedium(NS_ConvertUTF8toUTF16(nsCString(path.c_str())).get(), type, getter_AddRefs(medium));
-	if (medium == nsnull) {
-		virtualBox->OpenMedium(NS_ConvertUTF8toUTF16(nsCString(path.c_str())).get(), type, access, PR_FALSE, getter_AddRefs(medium));
-	}
+	virtualBox->OpenMedium(NS_ConvertUTF8toUTF16(nsCString(path.c_str())).get(), type, access, PR_FALSE, getter_AddRefs(medium));
 }
 
 /**
@@ -52,7 +49,7 @@ static void registerMediums(IVirtualBox *virtualBox, const string &path, const s
 		if (d->d_type == DT_REG) {
 			string name(d->d_name);
 
-			transform(name.begin(), name.end(), name.begin(), (int(*)(int))std::tolower); 
+			transform(name.begin(), name.end(), name.begin(), (int(*)(int))std::tolower);
 			if (name.rfind(ext) == (name.length() - ext.length())) {
 				nsCOMPtr<IMedium> medium;
 
@@ -82,7 +79,7 @@ static void registerMachines(IVirtualBox *virtualBox, const string &path) {
 		if (d->d_type == DT_REG) {
 			string name(d->d_name);
 
-			transform(name.begin(), name.end(), name.begin(), (int(*)(int))std::tolower); 
+			transform(name.begin(), name.end(), name.begin(), (int(*)(int))std::tolower);
 			if (name.rfind(".xml") == (name.length() - 4) ||
 				name.rfind(".vbox") == (name.length() - 5)) {
 				nsCOMPtr<IMachine> machine;
@@ -122,7 +119,7 @@ static int exportVirtualBox(IVirtualBox *virtualBox, const Parameters &parameter
 	if (buffer != NULL) {
 		// create xml writer
 		xmlTextWriterPtr writer = xmlNewTextWriter(buffer);
-	
+
 		if (writer != NULL) {
 			// writer document
 			xmlTextWriterStartDocument(writer, "1.0", "UTF-8", NULL);
@@ -193,19 +190,19 @@ static int exportVirtualBox(IVirtualBox *virtualBox, const Parameters &parameter
 
 						// export system informations
 						exportVirtualBoxSystem(virtualBox, writer);
-	
+
 						// export os types
 						exportVirtualBoxOSTypes(virtualBox, writer);
-	
+
 						// export dvd
 						exportVirtualBoxDvds(virtualBox, writer);
-	
+
 						// export fdd
 						exportVirtualBoxFdds(virtualBox, writer);
-	
+
 						// export hdd
 						exportVirtualBoxHdds(virtualBox, writer);
-	
+
 						// export machine
 						exportVirtualBoxMachines(virtualBox, writer);
 

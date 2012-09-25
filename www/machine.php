@@ -140,6 +140,28 @@ case 'export':
 	}
 	break;
 
+case 'extract':
+	$slot = stringParam('slot');
+	$hdd = $machine->$slot;
+	if (is_a($hdd, 'HDD')) {
+		$hdd2 = $hdd->duplicate();
+		if ($hdd2) {
+			$machine->$slot = $hdd2;
+			if ($machine->$slot->id == $hdd2->id) {
+				$hdd->destroy();
+			}
+		}
+	}
+	break;
+
+case 'compact':
+	$slot = stringParam('slot');
+	$hdd = $machine->$slot;
+	if (is_a($hdd, 'HDD')) {
+		$hdd->compact();
+	}
+	break;
+
 case 'adddisk':
 	$slot = NULL;
 	if (stringParam('disktype') == 'sata') {
@@ -204,28 +226,6 @@ case 'adddisk':
 case 'removedisk':
 	$slot = stringParam('slot');
 	$machine->$slot = NULL;
-	break;
-
-case 'extract':
-	$slot = stringParam('slot');
-	$hdd = $machine->$slot;
-	if (is_a($hdd, 'HDD')) {
-		$hdd2 = $hdd->duplicate();
-		if ($hdd2) {
-			$machine->$slot = $hdd2;
-			if ($machine->$slot->id == $hdd2->id) {
-				$hdd->destroy();
-			}
-		}
-	}
-	break;
-
-case 'compact':
-	$slot = stringParam('slot');
-	$hdd = $machine->$slot;
-	if (is_a($hdd, 'HDD')) {
-		$hdd->compact();
-	}
 	break;
 }
 

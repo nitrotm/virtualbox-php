@@ -44,16 +44,16 @@ void exportVirtualBoxOSTypes(IVirtualBox *virtualBox, xmlTextWriterPtr writer) {
 					ADDXMLINT64(oses[i]->GetRecommendedHDD, "hdd");
 
 					// recommended: pae
-					ADDXMLBOOL(oses[i]->GetRecommendedPae, "pae");
+					ADDXMLBOOL(oses[i]->GetRecommendedPAE, "pae");
 
 					// recommended: hpet
-					ADDXMLBOOL(oses[i]->GetRecommendedHpet, "hpet");
+					ADDXMLBOOL(oses[i]->GetRecommendedHPET, "hpet");
 
 					// recommended: rtcuseutc
-					ADDXMLBOOL(oses[i]->GetRecommendedRtcUseUtc, "rtcuseutc");
+					ADDXMLBOOL(oses[i]->GetRecommendedRTCUseUTC, "rtcuseutc");
 
 					// TODO: other recommended things
-					
+
 				xmlTextWriterEndElement(writer);
 			}
 
@@ -128,6 +128,6 @@ void exportVirtualBoxSystem(IVirtualBox *virtualBox, xmlTextWriterPtr writer) {
 				ADDXMLINT32U(systemProperties->GetMaxBootPosition, "maxbootpositions");
 			}
 		}
-		
+
 	xmlTextWriterEndElement(writer);
 }
