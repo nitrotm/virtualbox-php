@@ -3,7 +3,8 @@
 require_once('include/virtualbox.inc.php');
 
 // perform actions
-if (stringParam('op') == 'create') {
+switch (stringParam('op')) {
+case 'create':
 	$machine = Repository::createMachine(stringParam('name'), stringParam('ostype', 'Other'));
 	if ($machine && $machine->exists()) {
 		$machine->set(
@@ -90,6 +91,11 @@ if (stringParam('op') == 'create') {
 		header('Location: machine.php?machine='.$machine->id);
 		exit;
 	}
+	break;
+
+case 'import':
+	Repository::importMachine(stringParam('file'));
+	break;
 }
 
 // list machines
@@ -305,17 +311,17 @@ foreach (Repository::listHdds() as $hdd) {
 		<div class="content">
 			<div class="title">IMPORT MACHINE</div>
 <?
-if (sizeof(Repository::listOVFs()) > 0) {
+if (sizeof(Repository::listOVAs()) > 0) {
 ?>
 			<table cellspacing="0">
 				<tr class="title">
 					<th>Name</th>
 				</tr>
 <?
-	foreach (Repository::listOVFs() as $ovf) {
+	foreach (Repository::listOVAs() as $ova) {
 ?>
 				<tr>
-					<td><?=$ovf?><!-- [<a href="?op=import&ovf=<?=$ovf?>">import</a>] --></td>
+					<td><?=$ova?> [<a href="?op=import&file=<?=$ova?>">import</a>]</td>
 				</tr>
 <?
 	}

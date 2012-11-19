@@ -182,7 +182,6 @@ case 'adddisk':
 		}
 	}
 	if ($slot != NULL) {
-		// set hdd
 		switch (stringParam('disksource')) {
 		case 'new':
 			$machine->$slot = Repository::createHdd(intParam('disk', 8192));
@@ -219,7 +218,6 @@ case 'adddisk':
 			}
 			break;
 		}
-		$machine->$slot = Repository::createHdd(intParam('disk', 8192));
 	}
 	break;
 

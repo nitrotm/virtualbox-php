@@ -17,7 +17,7 @@ class Repository {
 	private static $fdds = array();
 	private static $hdds = array();
 	private static $machines = array();
-	private static $ovfs = array();
+	private static $ovas = array();
 
 
 	public static function getSystem($key) {
@@ -175,9 +175,24 @@ class Repository {
 		return FALSE;
 	}
 
+	public static function importMachine($file) {
+		$path = BASE_PATH.'/exports/'.$file;
+		if (!file_exists($path)) {
+			return FALSE;
+		}
 
-	public static function listOVFs() {
-		return array_values(self::$ovfs);
+		$lines = simpleExec(VIRTUALBOX_MGT_BIN, array('-q', 'import', $path));
+		foreach ($lines as $line) {
+			if (preg_match('/^UUID: ([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$/', $line, $matches)) {
+				return self::getMachine($matches[1]);
+			}
+		}
+		return FALSE;
+	}
+
+
+	public static function listOVAs() {
+		return array_values(self::$ovas);
 	}
 
 
@@ -218,17 +233,20 @@ class Repository {
 		}
 		uasort(self::$machines, array('Repository', 'sortByName'));
 
-		self::$ovfs = array();
-		$path = BASE_PATH.'/ovf';
+		self::$ovas = array();
+		$path = BASE_PATH.'/exports';
 		if (is_dir($path) && ($dh = opendir($path)) !== FALSE) {
 			while (($item = readdir($dh)) !== FALSE) {
+				if (is_file($path.'/'.$item) && strrpos($item, '.ova') === strlen($item) - strlen('.ova')) {
+					self::$ovas[] = $item;
+				}
 				if (is_file($path.'/'.$item) && strrpos($item, '.ovf') === strlen($item) - strlen('.ovf')) {
-					self::$ovfs[] = $item;
+					self::$ovas[] = $item;
 				}
 			}
 			closedir($dh);
 		}
-		sort(self::$ovfs);
+		sort(self::$ovas);
 		return TRUE;
 	}
 

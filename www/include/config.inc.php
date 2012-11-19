@@ -9,7 +9,7 @@
  *      /var/lib/virtualbox/fdd
  *      /var/lib/virtualbox/hdd
  *      /var/lib/virtualbox/machine
- *      /var/lib/virtualbox/ovf
+ *      /var/lib/virtualbox/exports
  *
  * - Change ownership to web server user/group
  *
