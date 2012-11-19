@@ -94,7 +94,11 @@ case 'create':
 	break;
 
 case 'import':
-	Repository::importMachine(stringParam('file'));
+	$machine = Repository::importMachine(stringParam('file'));
+	if ($machine && $machine->exists()) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
 	break;
 }
 
