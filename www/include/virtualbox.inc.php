@@ -234,18 +234,7 @@ class Repository {
 		uasort(self::$machines, array('Repository', 'sortByName'));
 
 		self::$ovas = array();
-		$path = BASE_PATH.'/exports';
-		if (is_dir($path) && ($dh = opendir($path)) !== FALSE) {
-			while (($item = readdir($dh)) !== FALSE) {
-				if (is_file($path.'/'.$item) && strrpos($item, '.ova') === strlen($item) - strlen('.ova')) {
-					self::$ovas[] = $item;
-				}
-				if (is_file($path.'/'.$item) && strrpos($item, '.ovf') === strlen($item) - strlen('.ovf')) {
-					self::$ovas[] = $item;
-				}
-			}
-			closedir($dh);
-		}
+		self::visitExports(BASE_PATH.'/exports');
 		sort(self::$ovas);
 		return TRUE;
 	}
@@ -378,6 +367,22 @@ class Repository {
 			}
 		}
 		return $vars;
+	}
+
+	public static function visitExports($path, $subPath = '') {
+		if (is_dir($path) && ($dh = opendir($path)) !== FALSE) {
+			while (($item = readdir($dh)) !== FALSE) {
+				$itemPath = strlen($subPath) > 0 ? $subPath.'/'.$item : $item;
+				if (is_dir($path.'/'.$item) && $item != '.' && $item != '..') {
+					self::visitExports($path.'/'.$item, $itemPath);
+				} else if (is_file($path.'/'.$item) && strrpos($item, '.ova') === strlen($item) - strlen('.ova')) {
+					self::$ovas[] = $itemPath;
+				} else if (is_file($path.'/'.$item) && strrpos($item, '.ovf') === strlen($item) - strlen('.ovf')) {
+					self::$ovas[] = $itemPath;
+				}
+			}
+			closedir($dh);
+		}
 	}
 
 
