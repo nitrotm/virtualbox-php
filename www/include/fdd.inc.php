@@ -31,7 +31,7 @@ class FDD extends AbstractMediumObject {
 	protected function onRefresh() {
 		return Repository::visitVariables(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--fdd', $this->values['path']))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--fdd', $this->values['path']))
 			)
 		);
 	}

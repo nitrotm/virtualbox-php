@@ -245,7 +245,7 @@ class Machine extends AbstractObject {
 	}
 
 	public function export() {
-		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'export', $this->id, '--output', BASE_PATH.'/ovf/'.$this->id.'.ovf')) == 0) {
+		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'export', $this->id, '--output', BASE_PATH.'/exports/'.$this->id.'.ova')) == 0) {
 			return TRUE;
 		}
 		return FALSE;
@@ -453,7 +453,7 @@ class Machine extends AbstractObject {
 					}
 				}
 				break;
-	
+
 				// ide controllers
 			case 'ide0':
 			case 'ide1':
@@ -502,7 +502,7 @@ class Machine extends AbstractObject {
 					}
 				}
 				break;
-	
+
 				// sata controllers
 			case 'sata0':
 			case 'sata1':
@@ -558,7 +558,7 @@ class Machine extends AbstractObject {
 					}
 				}
 				break;
-	
+
 				// network adapters
 			case 'nic0':
 			case 'nic1':
@@ -638,7 +638,7 @@ class Machine extends AbstractObject {
 	protected function onRefresh() {
 		return Repository::visitVariables(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--machine', $this->values['id']))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--machine', $this->values['id']))
 			)
 		);
 	}

@@ -85,7 +85,7 @@ class HDD extends AbstractMediumObject {
 	protected function onRefresh() {
 		return Repository::visitVariables(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--hdd', $this->values['path']))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--hdd', $this->values['path']))
 			)
 		);
 	}

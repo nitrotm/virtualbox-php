@@ -5,6 +5,7 @@
 class Parameters {
 public:
 	string basePath;
+	string systemPath;
 	string dvdPath;
 	string fddPath;
 	string hddPath;
@@ -98,6 +99,9 @@ static void registerMachines(IVirtualBox *virtualBox, const string &path) {
  */
 static int registerResources(IVirtualBox *virtualBox, const Parameters &parameters) {
 	// register mediums
+	if (parameters.systemPath.length() > 0) {
+		registerMediums(virtualBox, parameters.systemPath + "/additions", ".iso", DeviceType_DVD, AccessMode_ReadOnly, MediumType_Readonly, true);
+	}
 	registerMediums(virtualBox, parameters.basePath + "/dvd", ".iso", DeviceType_DVD, AccessMode_ReadOnly, MediumType_Readonly, true);
 	registerMediums(virtualBox, parameters.basePath + "/fdd", ".img", DeviceType_Floppy, AccessMode_ReadOnly, MediumType_Readonly, true);
 	registerMediums(virtualBox, parameters.basePath + "/hdd", ".vdi", DeviceType_HardDisk, AccessMode_ReadOnly, MediumType_MultiAttach, true);
@@ -228,7 +232,7 @@ static int exportVirtualBox(IVirtualBox *virtualBox, const Parameters &parameter
  * Print usage
  */
 static void usage() {
-	printf("usage: VBoxXML --base path ( [ --dvd path ] | [ --fdd path ] | [ --hdd path ] | [ --machine path ] )\n");
+	printf("usage: VBoxXML --base path ( --system path ) ( [ --dvd path ] | [ --fdd path ] | [ --hdd path ] | [ --machine path ] )\n");
 }
 
 
@@ -242,6 +246,8 @@ int main(int argc, char *argv[]) {
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "--base") == 0 && (i + 1) < argc) {
 			parameters.basePath = argv[++i];
+		} else if (strcmp(argv[i], "--system") == 0 && (i + 1) < argc) {
+			parameters.systemPath = argv[++i];
 		} else if (strcmp(argv[i], "--dvd") == 0 && (i + 1) < argc) {
 			parameters.dvdPath = argv[++i];
 		} else if (strcmp(argv[i], "--fdd") == 0 && (i + 1) < argc) {

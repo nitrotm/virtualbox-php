@@ -50,7 +50,7 @@ class Repository {
 		}
 		self::$dvds[$path] = self::visitDvd(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--dvd', $path))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--dvd', $path))
 			)
 		);
 		return self::$dvds[$path];
@@ -67,7 +67,7 @@ class Repository {
 		}
 		self::$fdds[$path] = self::visitFdd(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--fdd', $path))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--fdd', $path))
 			)
 		);
 		return self::$fdds[$path];
@@ -84,7 +84,7 @@ class Repository {
 		}
 		self::$hdds[$path] = self::visitHdd(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--hdd', $path))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--hdd', $path))
 			)
 		);
 		return self::$hdds[$path];
@@ -130,7 +130,7 @@ class Repository {
 		}
 		self::$machines[$id] = self::visitMachine(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--machine', $id))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--machine', $id))
 			)
 		);
 		return self::$machines[$id];
@@ -198,7 +198,7 @@ class Repository {
 
 	public static function refresh() {
 		list($system, $oses, $dvds, $fdds, $hdds, $machines) = self::visit(
-			new SimpleXMLElement(captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH)))
+			new SimpleXMLElement(captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH)))
 		);
 
 		self::$system = $system;
