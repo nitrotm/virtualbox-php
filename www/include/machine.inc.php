@@ -56,6 +56,51 @@ class Machine extends AbstractObject {
 		case 'biossystemtimeoffset':
 			return intval($this->get($name, '0'));
 
+			// storage controllers
+		case 'storage0':
+		case 'storage1':
+		case 'storage2':
+		case 'storage3':
+		case 'storage4':
+		case 'storage5':
+		case 'storage6':
+		case 'storage7':
+			$i = substr($name, 7);
+			if (!$this->has('storagecontrollername'.$i)) {
+				break;
+			}
+			$name = $this->get('storagecontrollername'.$i, '');
+			$ports = intval($this->get('storagecontrollerportcount'.$i, '0'));
+			$maxdevices = intval($this->get('storagecontrollermaxdeviceperport'.$i, '0'));
+			$devices = array();
+			for ($j = 0; $j < $ports; $j++) {
+				for ($k = 0; $k < $maxdevices; $k++) {
+					$slot = $name.'-'.$j.'-'.$k;
+					if (!$this->has($slot)) {
+						continue;
+					}
+					if ($this->endsWith($slot, '.vdi') || $this->endsWith($slot, '.vmdk')) {
+						$devices[$j][$k] = Repository::getHdd($this->get($slot));
+					} else if ($this->get($slot) == 'emptydrive') {
+						$devices[$j][$k] = new DVD();
+					} else {
+						$devices[$j][$k] = Repository::getDvd($this->get($slot));
+					}
+				}
+			}
+			return array(
+				'name' => $name,
+				'type' => $this->get('storagecontrollertype'.$i, 'none'),
+				'instance' => intval($this->get('storagecontrollerinstance'.$i, '0')),
+				'ports' => array(
+					'count' => $ports,
+					'min' => intval($this->get('storagecontrollerminportcount'.$i, '0')),
+					'max' => intval($this->get('storagecontrollermaxportcount'.$i, '0')),
+					'maxdevices' => $maxdevices
+				),
+				'devices' => $devices
+			);
+
 			// fdd controllers
 		case 'fd0':
 		case 'fd1':
@@ -99,11 +144,11 @@ class Machine extends AbstractObject {
 			if (!$this->has($slot)) {
 				break;
 			}
+			if ($this->endsWith($slot, '.vdi') || $this->endsWith($slot, '.vmdk')) {
+				return Repository::getHdd($this->get($slot));
+			}
 			if ($this->get($slot) == 'emptydrive') {
 				return new DVD();
-			}
-			if (strpos($this->get($slot), '.vdi') !== FALSE) {
-				return Repository::getHdd($this->get($slot));
 			}
 			return Repository::getDvd($this->get($slot));
 
@@ -143,11 +188,11 @@ class Machine extends AbstractObject {
 			if (!$this->has($slot)) {
 				break;
 			}
+			if ($this->endsWith($slot, '.vdi') || $this->endsWith($slot, '.vmdk')) {
+				return Repository::getHdd($this->get($slot));
+			}
 			if ($this->get($slot) == 'emptydrive') {
 				return new DVD();
-			}
-			if (strpos($this->get($slot), '.vdi') !== FALSE) {
-				return Repository::getHdd($this->get($slot));
 			}
 			return Repository::getDvd($this->get($slot));
 
@@ -237,6 +282,15 @@ class Machine extends AbstractObject {
 			return Repository::getOs($this->get('ostype'));
 		}
 		return parent::__get($name);
+	}
+
+
+	public function isStandardStorage() {
+		return (
+			$this->storage0 && $this->storage0['name'] == 'FLOPPY' &&
+			$this->storage1 && $this->storage1['name'] == 'IDE' &&
+			$this->storage2 && $this->storage2['name'] == 'SATA'
+		);
 	}
 
 

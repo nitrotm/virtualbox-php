@@ -70,6 +70,16 @@ abstract class AbstractObject {
 		return $default;
 	}
 
+	protected function startsWith($key, $prefix) {
+		$value = $this->get($key);
+		return (strpos($value, $prefix) === 0);
+	}
+
+	protected function endsWith($key, $suffix) {
+		$value = $this->get($key);
+		return (strrpos($value, $suffix) === strlen($value) - strlen($suffix));
+	}
+
 	protected function refresh() {
 		if (!$this->loaded) {
 			$this->loaded = TRUE;

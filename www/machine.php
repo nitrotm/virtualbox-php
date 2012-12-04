@@ -391,6 +391,36 @@ if ($machine->state == 'poweroff') {
 						</td>
 					</tr>
 <?
+for ($i = 0; $i < 8; $i++) {
+	$slot = 'storage'.$i;
+	$storage = $machine->$slot;
+	if ($storage) {
+?>
+					<tr>
+						<th>CTRL-<?=$i?></th>
+						<td>
+							name: <?=$storage['name']?><br/>
+							type: <?=$storage['type']?><br/>
+							instance: <?=$storage['instance']?><br/>
+							ports: <?=$storage['ports']['count']?> (min:<?=$storage['ports']['min']?>, max:<?=$storage['ports']['max']?>)<br/>
+							devices/port: <?=$storage['ports']['maxdevices']?><br/>
+<?
+		foreach ($storage['devices'] as $port => $devices) {
+			foreach ($devices as $index => $device) {
+				if (strlen($device->path) == 0) {
+					continue;
+				}
+?>
+						device[<?=$port?>][<?=$index?>]: <?=$device->path?><br/>
+<?
+			}
+		}
+?>
+						</td>
+					</tr>
+<?
+	}
+}
 for ($i = 0; $i < 2; $i++) {
 	$slot = 'fd'.$i;
 	$fd = $machine->$slot;
@@ -633,7 +663,62 @@ foreach (Machine::$vm as $name) {
 			</form>
 		</div>
 <?
-if ($machine->state == 'running' && $machine->vrde) {
+if ($machine->state == 'poweroff' && $machine->isStandardStorage()) {
+?>
+		<!-- Machine disks -->
+		<div class="content">
+			<div class="title">ADD DISK:</div>
+			<form method="POST">
+				<input type="hidden" name="machine" value="<?=$machine->id?>"/>
+				<input type="hidden" name="op" value="adddisk"/>
+				<table cellspacing="0">
+					<tr>
+						<th>HDD</th>
+						<td>
+							<input type="radio" name="disktype" value="ide" <?=stringParam('disktype') == 'ide' ? 'checked=""' : ''?>/>IDE<br/>
+							<input type="radio" name="disktype" value="sata" <?=stringParam('disktype') == '' || stringParam('disktype') == 'sata' ? 'checked=""' : ''?>/>SATA
+						</td>
+					</tr>
+					<tr>
+						<th>HDD Source</th>
+						<td>
+							<input type="radio" name="disksource" value="new" <?=stringParam('disksource') == 'new' ? 'checked=""' : ''?>/>new
+							<input type="text" name="disk" value="<?=intParam('disk', 8192)?>"/> [mb]<br/><br/>
+
+							<input type="radio" name="disksource" value="clone" <?=stringParam('disksource') == 'clone' ? 'checked=""' : ''?>/>clone
+							<input type="radio" name="disksource" value="differencial" <?=stringParam('disksource') == '' || stringParam('disksource') == 'differencial' ? 'checked=""' : ''?>/>differencial
+							<input type="radio" name="disksource" value="volatile" <?=stringParam('disksource') == 'volatile' ? 'checked=""' : ''?>/>volatile
+							<select name="hdd">
+<?
+$lastHdd = NULL;
+foreach (Repository::listHdds() as $hdd) {
+	if ($hdd->type == 'multiattach' && ($lastHdd == NULL || $lastHdd->time <= $hdd->time)) {
+		$lastHdd = $hdd;
+	}
+}
+foreach (Repository::listHdds() as $hdd) {
+	if ($hdd->type == 'multiattach') {
+		$selected = stringParam('hdd') == $hdd->path;
+		if (strlen(stringParam('hdd')) == 0) {
+			$selected = $hdd->path == $lastHdd->path;
+		}
+?>
+								<option value="<?=$hdd->path?>" <?=$selected ? 'selected=""' : ''?>><?=$hdd->name?></option>
+<?
+	}
+}
+?>
+							</select>
+						</td>
+					</tr>
+					<tr class="action">
+						<td colspan="2"><input type="submit" value="add"/></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+<?
+} else if ($machine->state == 'running' && $machine->vrde) {
 ?>
 		<!-- Machine console -->
 		<div class="content">
@@ -695,63 +780,6 @@ if ($machine->state == 'running' && $machine->vrde) {
 
 		</script>
 <?
-}
-if ($machine->state == 'poweroff') {
-?>
-		<!-- Machine disks -->
-		<div class="content">
-			<div class="title">ADD DISK:</div>
-			<form method="POST">
-				<input type="hidden" name="machine" value="<?=$machine->id?>"/>
-				<input type="hidden" name="op" value="adddisk"/>
-				<table cellspacing="0">
-					<tr>
-						<th>HDD</th>
-						<td>
-							<input type="radio" name="disktype" value="ide" <?=stringParam('disktype') == 'ide' ? 'checked=""' : ''?>/>IDE<br/>
-							<input type="radio" name="disktype" value="sata" <?=stringParam('disktype') == '' || stringParam('disktype') == 'sata' ? 'checked=""' : ''?>/>SATA
-						</td>
-					</tr>
-					<tr>
-						<th>HDD Source</th>
-						<td>
-							<input type="radio" name="disksource" value="new" <?=stringParam('disksource') == 'new' ? 'checked=""' : ''?>/>new
-							<input type="text" name="disk" value="<?=intParam('disk', 8192)?>"/> [mb]<br/><br/>
-
-							<input type="radio" name="disksource" value="clone" <?=stringParam('disksource') == 'clone' ? 'checked=""' : ''?>/>clone
-							<input type="radio" name="disksource" value="differencial" <?=stringParam('disksource') == '' || stringParam('disksource') == 'differencial' ? 'checked=""' : ''?>/>differencial
-							<input type="radio" name="disksource" value="volatile" <?=stringParam('disksource') == 'volatile' ? 'checked=""' : ''?>/>volatile
-							<select name="hdd">
-<?
-$lastHdd = NULL;
-foreach (Repository::listHdds() as $hdd) {
-	if ($hdd->type == 'multiattach' && ($lastHdd == NULL || $lastHdd->time <= $hdd->time)) {
-		$lastHdd = $hdd;
-	}
-}
-foreach (Repository::listHdds() as $hdd) {
-	if ($hdd->type == 'multiattach') {
-		$selected = stringParam('hdd') == $hdd->path;
-		if (strlen(stringParam('hdd')) == 0) {
-			$selected = $hdd->path == $lastHdd->path;
-		}
-?>
-								<option value="<?=$hdd->path?>" <?=$selected ? 'selected=""' : ''?>><?=$hdd->name?></option>
-<?
-	}
-}
-?>
-							</select>
-						</td>
-					</tr>
-					<tr class="action">
-						<td colspan="2"><input type="submit" value="add"/></td>
-					</tr>
-				</table>
-			</form>
-		</div>
-<?
-
 }
 
 include('include/footer.inc.php');

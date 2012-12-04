@@ -34,31 +34,27 @@ include('include/header.inc.php');
 $hdds = array();
 $usedHdds = array();
 foreach (Repository::listMachines() as $machine) {
-	for ($i = 0; $i < 4; $i++) {
-		$slot = 'ide'.$i;
-		$ide = $machine->$slot;
-		if (is_a($ide, 'HDD')) {
-			$hdd = $ide;
-			if ($machine->state == 'poweroff') {
-				$hdds[$hdd->path] = array('machine' => $machine, 'hdd' => $hdd, 'slot' => 'IDE-'.$i);
-			}
-			while ($hdd && !in_array($hdd->path, $usedHdds)) {
-				$usedHdds[] = $hdd->path;
-				$hdd = $hdd->parent;
-			}
-		}
-	}
-	for ($i = 0; $i < 30; $i++) {
-		$slot = 'sata'.$i;
-		$sata = $machine->$slot;
-		if (is_a($sata, 'HDD')) {
-			$hdd = $sata;
-			if ($machine->state == 'poweroff') {
-				$hdds[$hdd->path] = array('machine' => $machine, 'hdd' => $hdd, 'slot' => 'SATA-'.$i);
-			}
-			while ($hdd && !in_array($hdd->path, $usedHdds)) {
-				$usedHdds[] = $hdd->path;
-				$hdd = $hdd->parent;
+	for ($i = 0; $i < 8; $i++) {
+		$slot = 'storage'.$i;
+		$storage = $machine->$slot;
+		if ($storage) {
+			foreach ($storage['devices'] as $port => $devices) {
+				foreach ($devices as $index => $device) {
+					if (is_a($device, 'HDD')) {
+						$hdd = $device;
+						if ($machine->state == 'poweroff') {
+							$hdds[$hdd->path] = array(
+								'machine' => $machine,
+								'hdd' => $hdd,
+								'slot' => $storage['name'].'-'.$port.'-'.$index
+							);
+						}
+						while ($hdd && !in_array($hdd->path, $usedHdds)) {
+							$usedHdds[] = $hdd->path;
+							$hdd = $hdd->parent;
+						}
+					}
+				}
 			}
 		}
 	}
