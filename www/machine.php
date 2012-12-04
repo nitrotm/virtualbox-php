@@ -130,6 +130,11 @@ case 'set':
 			$values[$name] = boolParam($name);
 		}
 		$machine->set($values);
+	} else {
+		$values = array(
+			'vrde' => boolParam('vrde')
+		);
+		$machine->set($values);
 	}
 	break;
 
@@ -326,6 +331,10 @@ if ($machine->state == 'poweroff') {
 						</td>
 					</tr>
 					<tr>
+						<th>CHIPSET</th>
+						<td><?=$machine->chipset?></td>
+					</tr>
+					<tr>
 						<th>CPU(S)</th>
 						<td>
 <?
@@ -384,7 +393,8 @@ if ($machine->state == 'poweroff') {
 <?
 } else {
 ?>
-							<?=$machine->vrde ? 'on ('.$machine->vrdeaddress.':'.$machine->vrdeport.')' : 'off'?>
+							<input type="checkbox" name="vrde" value="on" <?=$machine->vrde ? 'checked=""' : ''?>/>
+							<?=$machine->vrde ? '('.$machine->vrdeaddress.':'.$machine->vrdeport.')' : ''?>
 <?
 }
 ?>
@@ -402,8 +412,7 @@ for ($i = 0; $i < 8; $i++) {
 							name: <?=$storage['name']?><br/>
 							type: <?=$storage['type']?><br/>
 							instance: <?=$storage['instance']?><br/>
-							ports: <?=$storage['ports']['count']?> (min:<?=$storage['ports']['min']?>, max:<?=$storage['ports']['max']?>)<br/>
-							devices/port: <?=$storage['ports']['maxdevices']?><br/>
+							ports: <?=$storage['ports']['count']?> x <?=$storage['ports']['maxdevices']?> (min:<?=$storage['ports']['min']?>, max:<?=$storage['ports']['max']?>)<br/>
 <?
 		foreach ($storage['devices'] as $port => $devices) {
 			foreach ($devices as $index => $device) {
@@ -636,10 +645,6 @@ foreach (Machine::$vm as $name) {
 						</td>
 					</tr>
 					<!--tr>
-						<th>Path</th>
-						<td><?=$machine->path?></td>
-					</tr-->
-					<!--tr>
 						<th>Audio</th>
 						<td><?=$machine->audio?> <?=$machine->audio != 'none' ? '('.$machine->audiocontroller.')' : ''?>
 						</td>
@@ -649,12 +654,16 @@ foreach (Machine::$vm as $name) {
 						<td><?=$machine->usb ? 'on' : 'off'?> <?=$machine->usbehci ? '(EHCI)' : ''?></td>
 					</tr-->
 					<!--tr>
-						<th>UUID</th>
-						<td><?=$machine->id?></td>
-					</tr-->
-					<!--tr>
 						<th valign="top">Debug</th>
-						<td><pre><? print_r($machine); ?></pre></td>
+						<td>
+<?
+	foreach ($machine->listValues() as $k => $v) {
+?>
+							<?=$k?>: <?=$v?><br/>
+<?
+	}
+?>
+						</td>
 					</tr-->
 					<tr class="action">
 						<td colspan="2"><input type="submit" value="set"/></td>

@@ -171,6 +171,27 @@ static const char * biosBootMenuModeConverter(PRUint32 value) {
 /**
  * Enumeration converter
  */
+static const char * storageBusConverter(PRUint32 value) {
+	switch (value) {
+	case StorageBus_Null:
+		return "none";
+	case StorageBus_IDE:
+		return "ide";
+	case StorageBus_SATA:
+		return "sata";
+	case StorageBus_SCSI:
+		return "scsi";
+	case StorageBus_Floppy:
+		return "floppy";
+	case StorageBus_SAS:
+		return "sas";
+	}
+	return "unknown";
+}
+
+/**
+ * Enumeration converter
+ */
 static const char * controllerTypeConverter(PRUint32 value) {
 	switch (value) {
 	case StorageControllerType_Null:
@@ -235,6 +256,21 @@ static const char * networkAdapterTypeConverter(PRUint32 value) {
 		return "82545EM";
 	case NetworkAdapterType_Virtio:
 		return "virtio";
+	}
+	return "unknown";
+}
+
+/**
+ * Enumeration converter
+ */
+static const char * promiscModePolicyConverter(PRUint32 value) {
+	switch (value) {
+	case NetworkAdapterPromiscModePolicy_Deny:
+		return "deny";
+	case NetworkAdapterPromiscModePolicy_AllowNetwork:
+		return "allow-vms";
+	case NetworkAdapterPromiscModePolicy_AllowAll:
+		return "allow-all";
 	}
 	return "unknown";
 }
@@ -320,6 +356,10 @@ static void exportVirtualBoxStorageController(IStorageController *storageControl
 	sprintf(name, "storagecontrollername%d", index);
 	ADDXMLSTRING(storageController->GetName, name);
 
+	// bus
+	sprintf(name, "storagecontrollerbus%d", index);
+	ADDXMLENUM(storageController->GetBus, name, storageBusConverter);
+
 	// type
 	sprintf(name, "storagecontrollertype%d", index);
 	ADDXMLENUM(storageController->GetControllerType, name, controllerTypeConverter);
@@ -343,6 +383,10 @@ static void exportVirtualBoxStorageController(IStorageController *storageControl
 	// max device per port
 	sprintf(name, "storagecontrollermaxdeviceperport%d", index);
 	ADDXMLINT32U(storageController->GetMaxDevicesPerPortCount, name);
+
+	// bootable
+	sprintf(name, "storagecontrollerbootable%d", index);
+	ADDXMLBOOL(storageController->GetBootable, name);
 }
 
 
@@ -444,6 +488,12 @@ static void exportVirtualBoxNetworkAdapter(INetworkAdapter *networkAdapter, PRUi
 		sprintf(name, "hostonlyadapter%d", index);
 		ADDXMLSTRING(networkAdapter->GetHostOnlyInterface, name);
 		break;
+
+	case NetworkAttachmentType_Generic:
+		// generic adapter
+		sprintf(name, "genericadapter%d", index);
+		ADDXMLSTRING(networkAdapter->GetGenericDriver, name);
+		break;
 	}
 
 	switch (attachmentType) {
@@ -476,6 +526,10 @@ static void exportVirtualBoxNetworkAdapter(INetworkAdapter *networkAdapter, PRUi
 		sprintf(name, "nicspeed%d", index);
 		ADDXMLINT32U(networkAdapter->GetLineSpeed, name);
 		break;
+
+		// promisc policy
+		sprintf(name, "nicpromisc%d", index);
+		ADDXMLENUM(networkAdapter->GetPromiscModePolicy, name, promiscModePolicyConverter);
 
 		// extra properties
 		{
@@ -532,31 +586,6 @@ static void exportVirtualBoxAudioAdapter(IAudioAdapter *audioAdapter, xmlTextWri
 
 
 /**
- * Export VirtualBox vrdp server (obsolete)
- *
-static void exportVirtualBoxVRDPServer(IVRDPServer *vrdpServer, xmlTextWriterPtr writer) {
-	// find info
-	PRBool enabled = PR_FALSE;
-
-	vrdpServer->GetEnabled(&enabled);
-
-	// vrdp enabled
-	ADDXMLBOOL(vrdpServer->GetEnabled, "vrdp");
-
-	if (enabled == PR_TRUE) {
-		// vrdp address
-		ADDXMLSTRING(vrdpServer->GetNetAddress, "vrdpaddress");
-
-		// vrdp ports
-		ADDXMLSTRING(vrdpServer->GetPorts, "vrdpport");
-
-		// TODO: vrdp auth, ...
-	}
-}
-*/
-
-
-/**
  * Export VirtualBox vrde server
  */
 static void exportVirtualBoxVRDEServer(IVRDEServer *vrdeServer, xmlTextWriterPtr writer) {
@@ -576,6 +605,12 @@ static void exportVirtualBoxVRDEServer(IVRDEServer *vrdeServer, xmlTextWriterPtr
 
 		// vrde auth lib
 		ADDXMLSTRING(vrdeServer->GetAuthLibrary, "vrde.authlib");
+
+		// vrde multicon
+		ADDXMLBOOL(vrdeServer->GetAllowMultiConnection, "vrde.multicon");
+
+		// vrde reusecon
+		ADDXMLBOOL(vrdeServer->GetReuseSingleConnection, "vrde.reusecon");
 
 		// vrde properties
 		{
@@ -796,9 +831,6 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 			// io cache size
 			ADDXMLINT32U(machine->GetIOCacheSize, "iocachesize");
 
-			// io cache size (obsolete)
-//			ADDXMLINT32U(machine->GetIOBandwidthMax, "iobandwidth");
-
 			// chipset type
 			ADDXMLENUM(machine->GetChipsetType, "chipset", chipsetTypeConverter);
 
@@ -881,16 +913,6 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 					exportVirtualBoxAudioAdapter(value, writer);
 				}
 			}
-
-			// vrdp server (obsolete)
-/*			{
-				nsCOMPtr<IVRDPServer> value;
-
-				rc = machine->GetVRDPServer(getter_AddRefs(value));
-				if (NS_SUCCEEDED(rc)) {
-					exportVirtualBoxVRDPServer(value, writer);
-				}
-			}*/
 
 			// vrde server
 			{

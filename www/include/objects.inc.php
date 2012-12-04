@@ -26,6 +26,15 @@ abstract class AbstractObject {
 	}
 
 
+	public function listValues() {
+		$map = array();
+		foreach ($this->values as $k => $v) {
+			$map[$k] = $v;
+		}
+		ksort($map);
+		return $map;
+	}
+
 	public function set($values) {
 		if ($this->onChange($values)) {
 			$this->loaded = FALSE;
@@ -100,8 +109,10 @@ abstract class AbstractMediumObject extends AbstractObject {
 		switch ($name) {
 		case 'shortname':
 			$value = $this->get('name');
-			if (strpos($value, '.vdi') !== FALSE) {
-				return substr($value, 0, strpos($value, '.vdi'));
+			foreach (array('.vdi', '.vmdk') as $suffix) {
+				if (strrpos($value, $suffix) === strlen($value) - strlen($suffix)) {
+					return substr($value, 0, strrpos($value, $suffix));
+				}
 			}
 			return $value;
 
