@@ -46,8 +46,15 @@ case 'reboot':
 	}
 	break;
 
+case 'acpipowerbutton':
+	if ($machine->poweroff(TRUE)) {
+		header('Location: machine.php?machine='.$machine->id);
+		exit;
+	}
+	break;
+
 case 'poweroff':
-	if ($machine->poweroff()) {
+	if ($machine->poweroff(FALSE)) {
 		header('Location: machine.php?machine='.$machine->id);
 		exit;
 	}
@@ -131,10 +138,10 @@ case 'set':
 		}
 		$machine->set($values);
 	} else {
-		$values = array(
-			'vrde' => boolParam('vrde')
-		);
-		$machine->set($values);
+		if ($machine->enableVRDE(boolParam('vrde'))) {
+			header('Location: machine.php?machine='.$machine->id);
+			exit;
+		}
 	}
 	break;
 
@@ -275,6 +282,7 @@ case 'running':
 							<a href="machine.php?machine=<?=$machine->id?>&op=pause">pause</a>
 							<a href="machine.php?machine=<?=$machine->id?>&op=freeze">freeze</a>
 							<a href="machine.php?machine=<?=$machine->id?>&op=reboot">reboot</a>
+							<a href="machine.php?machine=<?=$machine->id?>&op=acpipowerbutton">poweroff(acpi)</a>
 							<a href="machine.php?machine=<?=$machine->id?>&op=poweroff">poweroff</a>
 <?
 	break;

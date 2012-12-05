@@ -353,8 +353,16 @@ class Machine extends AbstractObject {
 		return FALSE;
 	}
 
-	public function poweroff() {
-		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'controlvm', $this->id, 'poweroff')) == 0) {
+	public function poweroff($acpi = FALSE) {
+		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'controlvm', $this->id, $acpi ? 'acpipowerbutton' : 'poweroff')) == 0) {
+			$this->loaded = FALSE;
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	public function enableVRDE($enabled) {
+		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'controlvm', $this->id, 'vrde', $enabled ? 'on' : 'off')) == 0) {
 			$this->loaded = FALSE;
 			return TRUE;
 		}
