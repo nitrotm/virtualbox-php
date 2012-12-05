@@ -210,6 +210,7 @@ class Machine extends AbstractObject {
 			case 'nat':
 				return array(
 					'type' => 'nat',
+					'driver' => $this->get('nictype'.$i, ''),
 					'mac' => $this->get('macaddress'.$i, '000000000000'),
 					'mactext' => self::formatMAC($this->get('macaddress'.$i, '000000000000')),
 					'connected' => $this->get('cableconnected'.$i, 'off') == 'on',
@@ -218,6 +219,7 @@ class Machine extends AbstractObject {
 			case 'bridged':
 				return array(
 					'type' => 'bridged',
+					'driver' => $this->get('nictype'.$i, ''),
 					'mac' => $this->get('macaddress'.$i, '000000000000'),
 					'mactext' => self::formatMAC($this->get('macaddress'.$i, '000000000000')),
 					'adapter' => $this->get('bridgeadapter'.$i, 'eth0'),
@@ -227,6 +229,7 @@ class Machine extends AbstractObject {
 			case 'intnet':
 				return array(
 					'type' => 'intnet',
+					'driver' => $this->get('nictype'.$i, ''),
 					'mac' => $this->get('macaddress'.$i, '000000000000'),
 					'mactext' => self::formatMAC($this->get('macaddress'.$i, '000000000000')),
 					'net' => $this->get('intnet'.$i, 'intnet'),
@@ -236,6 +239,7 @@ class Machine extends AbstractObject {
 			case 'hostonly':
 				return array(
 					'type' => 'hostonly',
+					'driver' => $this->get('nictype'.$i, ''),
 					'mac' => $this->get('macaddress'.$i, '000000000000'),
 					'mactext' => self::formatMAC($this->get('macaddress'.$i, '000000000000')),
 					'adapter' => $this->get('hostonlyadapter'.$i, 'vboxnet0'),

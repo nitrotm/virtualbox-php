@@ -11,6 +11,7 @@
 #include <dirent.h>
 #include <time.h>
 #include <string>
+#include <vector>
 #include <cctype>
 #include <algorithm>
 

@@ -115,7 +115,7 @@ case 'set':
 		foreach (arrayParam('net') as $net) {
 			$machine->$net = array(
 				'type' => stringParam($net.'_type', 'none'),
-				'driver' => '82543GC',
+				'driver' => stringParam($net.'_driver', '82543GC'),
 				'mac' => str_replace(':', '', stringParam($net.'_mac', 'auto')),
 				'adapter' => stringParam($net.'_adapter', FALSE),
 				'connected' => 'on'
@@ -582,6 +582,17 @@ for ($i = 0; $i < 8; $i++) {
 				?><option value="<?=$key?>" selected=""><?=$value?></option><?php
 			} else {
 				?><option value="<?=$key?>"><?=$value?></option><?php
+			}
+		}
+?>
+							</select><br/>
+							driver: <select name="<?=$slot?>_driver">
+<?php
+		foreach (array('Am79C970A', 'Am79C973', '82540EM', '82543GC', '82545EM', 'virtio') as $value) {
+			if ($value == $nic['driver']) {
+				?><option value="<?=$value?>" selected=""><?=$value?></option><?php
+			} else {
+				?><option value="<?=$value?>"><?=$value?></option><?php
 			}
 		}
 ?>
