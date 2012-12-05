@@ -143,7 +143,6 @@ if (sizeof($running) > 0 || sizeof($poweroff) > 0) {
 				<tr>
 					<td>
 						<a href="machine.php?machine=<?=$machine->id?>"><?=$machine->name?></a>
-						<? if ($machine->ready && stripos($machine->product, 'linux') !== FALSE) { ?>[<a href="http://<?=$machine->net0['ip']?>/system/" target="_blank">admin console</a>]<? } ?>
 						<? if ($machine->ready) { ?>(<?=$machine->net0['ip']?>)<? } ?>
 					</td>
 					<td width="200"><?=$machine->os->name?></td>
