@@ -641,7 +641,7 @@ static void exportVirtualBoxVRDEServer(IVRDEServer *vrdeServer, xmlTextWriterPtr
 
 /**
  * Export VirtualBox usb controller
- */
+ *
 static void exportVirtualBoxUSBController(IUSBController *usbController, xmlTextWriterPtr writer) {
 	// find info
 	PRBool enabled = PR_FALSE;
@@ -655,7 +655,7 @@ static void exportVirtualBoxUSBController(IUSBController *usbController, xmlText
 		// ehci
 		ADDXMLBOOL(usbController->GetEnabledEHCI, "usbehci");
 	}
-}
+}*/
 
 
 /**
@@ -785,13 +785,13 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 				}
 			}
 
-			// hwvirtexexcl
+			// vtxvpid
 			{
 				PRBool value;
 
-				rc = machine->GetHWVirtExProperty(HWVirtExPropertyType_Exclusive, &value);
+				rc = machine->GetHWVirtExProperty(HWVirtExPropertyType_VPID, &value);
 				if (NS_SUCCEEDED(rc)) {
-					WRITEXMLBOOL("hwvirtexexcl", value);
+					WRITEXMLBOOL("vtxvpid", value);
 				}
 			}
 
@@ -805,6 +805,16 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 				}
 			}
 
+			// unrestrictedexec
+			{
+				PRBool value;
+
+				rc = machine->GetHWVirtExProperty(HWVirtExPropertyType_UnrestrictedExecution, &value);
+				if (NS_SUCCEEDED(rc)) {
+					WRITEXMLBOOL("unrestrictedexec", value);
+				}
+			}
+
 			// largepages
 			{
 				PRBool value;
@@ -815,13 +825,13 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 				}
 			}
 
-			// vtxvpid
+			// force
 			{
 				PRBool value;
 
-				rc = machine->GetHWVirtExProperty(HWVirtExPropertyType_VPID, &value);
+				rc = machine->GetHWVirtExProperty(HWVirtExPropertyType_Force, &value);
 				if (NS_SUCCEEDED(rc)) {
-					WRITEXMLBOOL("vtxvpid", value);
+					WRITEXMLBOOL("hwforce", value);
 				}
 			}
 
@@ -924,15 +934,15 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 				}
 			}
 
-			// usb controller
-			{
-				nsCOMPtr<IUSBController> value;
+			// usb controllers
+			// {
+			// 	nsCOMPtr<IUSBController> value;
 
-				rc = machine->GetUSBController(getter_AddRefs(value));
-				if (NS_SUCCEEDED(rc)) {
-					exportVirtualBoxUSBController(value, writer);
-				}
-			}
+			// 	rc = machine->GetUSBController(getter_AddRefs(value));
+			// 	if (NS_SUCCEEDED(rc)) {
+			// 		exportVirtualBoxUSBController(value, writer);
+			// 	}
+			// }
 
 			// guest properties
 			{
