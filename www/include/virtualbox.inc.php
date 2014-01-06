@@ -164,7 +164,7 @@ class Repository {
 						$machine->destroy();
 						return FALSE;
 					}
-					if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'storagectl', $machine->id, '--name', 'SATA', '--add', 'sata', '--controller', 'IntelAHCI', '--sataportcount', '1')) != 0) {
+					if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'storagectl', $machine->id, '--name', 'SATA', '--add', 'sata', '--controller', 'IntelAHCI', '--portcount', '1')) != 0) {
 						$machine->destroy();
 						return FALSE;
 					}
