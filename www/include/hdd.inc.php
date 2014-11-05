@@ -39,6 +39,14 @@ class HDD extends AbstractMediumObject {
 		return FALSE;
 	}
 
+	public function resize($mbsize) {
+		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'modifyhd', $this->path, '--resize', $mbsize)) == 0) {
+			$this->loaded = FALSE;
+			return TRUE;
+		}
+		return FALSE;
+	}
+
 	public function close() {
 		if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'closemedium', 'disk', $this->path)) == 0) {
 			$this->loaded = FALSE;
@@ -85,7 +93,7 @@ class HDD extends AbstractMediumObject {
 	protected function onRefresh() {
 		return Repository::visitVariables(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--hdd', $this->values['path']))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--hdd', $this->values['path']))
 			)
 		);
 	}

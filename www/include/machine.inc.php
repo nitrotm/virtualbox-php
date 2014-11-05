@@ -704,7 +704,7 @@ class Machine extends AbstractObject {
 	protected function onRefresh() {
 		return Repository::visitVariables(
 			new SimpleXMLElement(
-				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--system', VIRTUALBOX_PATH, '--machine', $this->values['id']))
+				captureExec(VIRTUALBOX_XML_BIN, array('--base', BASE_PATH, '--machine', $this->values['id']))
 			)
 		);
 	}

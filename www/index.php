@@ -83,7 +83,7 @@ case 'create':
 		// set nic
 		$machine->nic0 = array(
 			'type' => 'bridged',
-			'driver' => '82543GC',
+			'driver' => '82545EM',
 			'adapter' => 'eth0',
 			'connected' => 'on'
 		);

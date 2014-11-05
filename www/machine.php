@@ -233,6 +233,14 @@ case 'adddisk':
 	}
 	break;
 
+case 'resizedisk':
+	$slot = stringParam('slot');
+	$hdd = $machine->$slot;
+	if (is_a($hdd, 'HDD')) {
+		$hdd->resize(intParam('disk', 8192));
+	}
+	break;
+
 case 'removedisk':
 	$slot = stringParam('slot');
 	$machine->$slot = NULL;
@@ -741,6 +749,51 @@ foreach (Repository::listHdds() as $hdd) {
 					</tr>
 					<tr class="action">
 						<td colspan="2"><input type="submit" value="add"/></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="content">
+			<div class="title">RESIZE DISK:</div>
+			<form method="POST">
+				<input type="hidden" name="machine" value="<?=$machine->id?>"/>
+				<input type="hidden" name="op" value="resizedisk"/>
+				<table cellspacing="0">
+					<tr>
+						<th>HDD</th>
+						<td>
+							<select name="slot">
+<?
+for ($i = 0; $i < 4; $i++) {
+	$slot = 'ide'.$i;
+	$ide = $machine->$slot;
+	if (is_a($ide, 'HDD')) {
+?>
+								<option value="<?=$slot?>">IDE-<?=$i?></option>
+<?
+	}
+}
+for ($i = 0; $i < 30; $i++) {
+	$slot = 'sata'.$i;
+	$sata = $machine->$slot;
+	if (is_a($sata, 'HDD')) {
+?>
+								<option value="<?=$slot?>">SATA-<?=$i?></option>
+<?
+	}
+}
+?>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>New size</th>
+						<td>
+							<input type="text" name="disk" value="<?=intParam('disk', 8192)?>"/> [mb]
+						</td>
+					</tr>
+					<tr class="action">
+						<td colspan="2"><input type="submit" value="resize"/></td>
 					</tr>
 				</table>
 			</form>
