@@ -711,14 +711,14 @@ void exportVirtualBoxMachine(IVirtualBox *virtualBox, IMachine *machine, xmlText
 			ADDXMLBOOL(machine->GetCPUHotPlugEnabled, "cpuhotplug");
 
 			// synthcpu
-			{
-				PRBool value;
+			// {
+			// 	PRBool value;
 
-				rc = machine->GetCPUProperty(CPUPropertyType_Synthetic, &value);
-				if (NS_SUCCEEDED(rc)) {
-					WRITEXMLBOOL("synthcpu", value);
-				}
-			}
+			// 	rc = machine->GetCPUProperty(CPUPropertyType_Synthetic, &value);
+			// 	if (NS_SUCCEEDED(rc)) {
+			// 		WRITEXMLBOOL("synthcpu", value);
+			// 	}
+			// }
 
 			// firmware type
 			ADDXMLENUM(machine->GetFirmwareType, "firmware", firmwareTypeConverter);
