@@ -3,131 +3,131 @@
 
 
 void exportVirtualBoxOSTypes(IVirtualBox *virtualBox, xmlTextWriterPtr writer) {
-	IGuestOSType **oses = NULL;
-	PRUint32 osesCount = 0;
-	nsresult rc = virtualBox->GetGuestOSTypes(&osesCount, &oses);
+    IGuestOSType **oses = NULL;
+    PRUint32 osesCount = 0;
+    nsresult rc = virtualBox->GetGuestOSTypes(&osesCount, &oses);
 
-	if (NS_SUCCEEDED(rc)) {
-		xmlTextWriterStartElement(writer, TOXMLCHAR("oses"));
+    if (NS_SUCCEEDED(rc)) {
+        xmlTextWriterStartElement(writer, TOXMLCHAR("oses"));
 
-			for (PRUint32 i = 0; i < osesCount; i++) {
-				xmlTextWriterStartElement(writer, TOXMLCHAR("os"));
+            for (PRUint32 i = 0; i < osesCount; i++) {
+                xmlTextWriterStartElement(writer, TOXMLCHAR("os"));
 
-					// id
-					ADDXMLSTRING(oses[i]->GetId, "id");
+                    // id
+                    ADDXMLSTRING(oses[i]->GetId, "id");
 
-					// description
-					ADDXMLSTRING(oses[i]->GetDescription, "description");
+                    // description
+                    ADDXMLSTRING(oses[i]->GetDescription, "description");
 
-					// family
-					ADDXMLSTRING(oses[i]->GetFamilyId, "family");
+                    // family
+                    ADDXMLSTRING(oses[i]->GetFamilyId, "family");
 
-					// family description
-					ADDXMLSTRING(oses[i]->GetFamilyDescription, "familydescription");
+                    // family description
+                    ADDXMLSTRING(oses[i]->GetFamilyDescription, "familydescription");
 
-					// 64 bits
-					ADDXMLBOOL(oses[i]->GetIs64Bit, "64bit");
+                    // 64 bits
+                    ADDXMLBOOL(oses[i]->GetIs64Bit, "64bit");
 
-					// recommended: ioapic
-					ADDXMLBOOL(oses[i]->GetRecommendedIOAPIC, "ioapic");
+                    // recommended: ioapic
+                    ADDXMLBOOL(oses[i]->GetRecommendedIOAPIC, "ioapic");
 
-					// recommended: virtex
-					ADDXMLBOOL(oses[i]->GetRecommendedVirtEx, "virtex");
+                    // recommended: virtex
+                    ADDXMLBOOL(oses[i]->GetRecommendedVirtEx, "virtex");
 
-					// recommended: ram
-					ADDXMLINT32U(oses[i]->GetRecommendedRAM, "memory");
+                    // recommended: ram
+                    ADDXMLINT32U(oses[i]->GetRecommendedRAM, "memory");
 
-					// recommended: vram
-					ADDXMLINT32U(oses[i]->GetRecommendedVRAM, "vram");
+                    // recommended: vram
+                    ADDXMLINT32U(oses[i]->GetRecommendedVRAM, "vram");
 
-					// recommended: hdd
-					ADDXMLINT64(oses[i]->GetRecommendedHDD, "hdd");
+                    // recommended: hdd
+                    ADDXMLINT64(oses[i]->GetRecommendedHDD, "hdd");
 
-					// recommended: pae
-					ADDXMLBOOL(oses[i]->GetRecommendedPAE, "pae");
+                    // recommended: pae
+                    ADDXMLBOOL(oses[i]->GetRecommendedPAE, "pae");
 
-					// recommended: hpet
-					ADDXMLBOOL(oses[i]->GetRecommendedHPET, "hpet");
+                    // recommended: hpet
+                    ADDXMLBOOL(oses[i]->GetRecommendedHPET, "hpet");
 
-					// recommended: rtcuseutc
-					ADDXMLBOOL(oses[i]->GetRecommendedRTCUseUTC, "rtcuseutc");
+                    // recommended: rtcuseutc
+                    ADDXMLBOOL(oses[i]->GetRecommendedRTCUseUTC, "rtcuseutc");
 
-					// TODO: other recommended things
+                    // TODO: other recommended things
 
-				xmlTextWriterEndElement(writer);
-			}
+                xmlTextWriterEndElement(writer);
+            }
 
-		xmlTextWriterEndElement(writer);
+        xmlTextWriterEndElement(writer);
 
-		NS_FREE_XPCOM_ISUPPORTS_POINTER_ARRAY(osesCount, oses);
-	}
+        NS_FREE_XPCOM_ISUPPORTS_POINTER_ARRAY(osesCount, oses);
+    }
 }
 
 void exportVirtualBoxSystem(IVirtualBox *virtualBox, xmlTextWriterPtr writer) {
-	nsresult rc;
+    nsresult rc;
 
-	xmlTextWriterStartElement(writer, TOXMLCHAR("system"));
+    xmlTextWriterStartElement(writer, TOXMLCHAR("system"));
 
-		// version
-		ADDXMLSTRING(virtualBox->GetVersion, "version");
+        // version
+        ADDXMLSTRING(virtualBox->GetVersion, "version");
 
-		// revision
-		ADDXMLINT32U(virtualBox->GetRevision, "revision");
+        // revision
+        ADDXMLINT32U(virtualBox->GetRevision, "revision");
 
-		// home folder
-		ADDXMLSTRING(virtualBox->GetHomeFolder, "home");
+        // home folder
+        ADDXMLSTRING(virtualBox->GetHomeFolder, "home");
 
-		// system properties
-		{
-			nsCOMPtr<ISystemProperties> systemProperties;
-			nsresult rc = virtualBox->GetSystemProperties(getter_AddRefs(systemProperties));
+        // system properties
+        {
+            nsCOMPtr<ISystemProperties> systemProperties;
+            nsresult rc = virtualBox->GetSystemProperties(getter_AddRefs(systemProperties));
 
-			if (NS_SUCCEEDED(rc)) {
-				// min guest ram
-				ADDXMLINT32U(systemProperties->GetMinGuestRAM, "minguestmemory");
+            if (NS_SUCCEEDED(rc)) {
+                // min guest ram
+                ADDXMLINT32U(systemProperties->GetMinGuestRAM, "minguestmemory");
 
-				// max guest ram
-				ADDXMLINT32U(systemProperties->GetMaxGuestRAM, "maxguestmemory");
+                // max guest ram
+                ADDXMLINT32U(systemProperties->GetMaxGuestRAM, "maxguestmemory");
 
-				// min guest vram
-				ADDXMLINT32U(systemProperties->GetMinGuestVRAM, "minguestvram");
+                // min guest vram
+                ADDXMLINT32U(systemProperties->GetMinGuestVRAM, "minguestvram");
 
-				// max guest vram
-				ADDXMLINT32U(systemProperties->GetMaxGuestVRAM, "maxguestvram");
+                // max guest vram
+                ADDXMLINT32U(systemProperties->GetMaxGuestVRAM, "maxguestvram");
 
-				// min guest cpu
-				ADDXMLINT32U(systemProperties->GetMinGuestCPUCount, "minguestcpus");
+                // min guest cpu
+                ADDXMLINT32U(systemProperties->GetMinGuestCPUCount, "minguestcpus");
 
-				// max guest cpu
-				ADDXMLINT32U(systemProperties->GetMaxGuestCPUCount, "maxguestcpus");
+                // max guest cpu
+                ADDXMLINT32U(systemProperties->GetMaxGuestCPUCount, "maxguestcpus");
 
-				// max guest monitors
-				ADDXMLINT32U(systemProperties->GetMaxGuestMonitors, "maxguestmonitors");
+                // max guest monitors
+                ADDXMLINT32U(systemProperties->GetMaxGuestMonitors, "maxguestmonitors");
 
-				// network adapter count
-				{
-					PRUint32 networkAdaptersCount;
+                // network adapter count
+                {
+                    PRUint32 networkAdaptersCount;
 
-					rc = systemProperties->GetMaxNetworkAdapters(ChipsetType_PIIX3, &networkAdaptersCount);
-					if (NS_SUCCEEDED(rc)) {
-						WRITEXMLINT32("networkadapters_PIIX3", networkAdaptersCount);
-					}
-					rc = systemProperties->GetMaxNetworkAdapters(ChipsetType_ICH9, &networkAdaptersCount);
-					if (NS_SUCCEEDED(rc)) {
-						WRITEXMLINT32("networkadapters_ICH9", networkAdaptersCount);
-					}
-				}
+                    rc = systemProperties->GetMaxNetworkAdapters(ChipsetType_PIIX3, &networkAdaptersCount);
+                    if (NS_SUCCEEDED(rc)) {
+                        WRITEXMLINT32("networkadapters_PIIX3", networkAdaptersCount);
+                    }
+                    rc = systemProperties->GetMaxNetworkAdapters(ChipsetType_ICH9, &networkAdaptersCount);
+                    if (NS_SUCCEEDED(rc)) {
+                        WRITEXMLINT32("networkadapters_ICH9", networkAdaptersCount);
+                    }
+                }
 
-				// serial port count
-				ADDXMLINT32U(systemProperties->GetSerialPortCount, "serialports");
+                // serial port count
+                ADDXMLINT32U(systemProperties->GetSerialPortCount, "serialports");
 
-				// parallel port count
-				ADDXMLINT32U(systemProperties->GetParallelPortCount, "parallelports");
+                // parallel port count
+                ADDXMLINT32U(systemProperties->GetParallelPortCount, "parallelports");
 
-				// max boot position
-				ADDXMLINT32U(systemProperties->GetMaxBootPosition, "maxbootpositions");
-			}
-		}
+                // max boot position
+                ADDXMLINT32U(systemProperties->GetMaxBootPosition, "maxbootpositions");
+            }
+        }
 
-	xmlTextWriterEndElement(writer);
+    xmlTextWriterEndElement(writer);
 }

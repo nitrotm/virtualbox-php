@@ -36,18 +36,18 @@ using namespace std;
  * Convert XPCOM nsString to std::string
  */
 inline string convertString(const nsString &str) {
-	char *ptr = ToNewUTF8String(str);
-	string value(ptr);
+    char *ptr = ToNewUTF8String(str);
+    string value(ptr);
 
-	free(ptr);
-	return value;
+    free(ptr);
+    return value;
 }
 inline string convertString(const nsCString &str) {
-	char *ptr = ToNewCString(str);
-	string value(ptr);
+    char *ptr = ToNewCString(str);
+    string value(ptr);
 
-	free(ptr);
-	return value;
+    free(ptr);
+    return value;
 }
 
 
