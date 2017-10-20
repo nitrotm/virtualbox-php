@@ -20,11 +20,13 @@
  * - Install OVF machines in ovf/ sub-folder
  */
 
-define('VIRTUALBOX_PATH',			'/usr/lib/virtualbox');
-define('VIRTUALBOX_MGT_BIN',		VIRTUALBOX_PATH.'/VBoxManage');
-define('VIRTUALBOX_OPENMEDIUM_BIN',	VIRTUALBOX_PATH.'/VBoxOpenMedium');
-define('VIRTUALBOX_XML_BIN',		VIRTUALBOX_PATH.'/VBoxXML');
+define('VIRTUALBOX_PATH',           '/usr/lib/virtualbox');
+define('VIRTUALBOX_MGT_BIN',        VIRTUALBOX_PATH.'/VBoxManage');
+define('VIRTUALBOX_OPENMEDIUM_BIN', VIRTUALBOX_PATH.'/VBoxOpenMedium');
+define('VIRTUALBOX_XML_BIN',        VIRTUALBOX_PATH.'/VBoxXML');
 
-define('BASE_PATH', '/var/lib/virtualbox');
+define('BASE_PATH',                 '/var/lib/virtualbox');
+
+define('DEFAULT_NET_ADAPTER',       'eth0');
 
 ?>
