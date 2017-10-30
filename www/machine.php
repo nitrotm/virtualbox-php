@@ -739,7 +739,27 @@ if ($machine->state == 'poweroff') {
                         <th>USB Devices</th>
                         <td>
 <?
-foreach (readUSBInfo() as $usbDevice) {
+$usbDevices = readUSBInfo();
+foreach ($machine->usbfilters as $filter) {
+    $usbDevice = array(
+        'bus' => 0,
+        'device' => 0,
+        'vendor' => $filter['vendorid'],
+        'product' => $filter['productid'],
+        'name' => $filter['name']
+    );
+    foreach ($usbDevices as $other) {
+        if ($filter['vendorid'] == $other['vendor'] && $filter['productid'] == $other['product']) {
+            $usbDevice = $other;
+            break;
+        }
+    }
+?>
+                            <input type="checkbox" name="usbfilter[]" value="<?=sprintf('%04X:%04X', $filter['vendorid'], $filter['productid'])?>" checked="">
+                            <?=sprintf("%03d.%03d %04X:%04X %s", $usbDevice['bus'], $usbDevice['device'], $usbDevice['vendor'], $usbDevice['product'], $usbDevice['name'])?><br/>
+<?
+}
+foreach ($usbDevices as $usbDevice) {
     $active = FALSE;
     foreach ($machine->usbfilters as $filter) {
         if ($filter['vendorid'] == $usbDevice['vendor'] && $filter['productid'] == $usbDevice['product']) {
@@ -747,8 +767,11 @@ foreach (readUSBInfo() as $usbDevice) {
             break;
         }
     }
+    if ($active) {
+        continue;
+    }
 ?>
-                            <input type="checkbox" name="usbfilter[]" value="<?=sprintf('%04X:%04X', $usbDevice['vendor'], $usbDevice['product'])?>" <?=$active ? 'checked=""' : ''?>>
+                            <input type="checkbox" name="usbfilter[]" value="<?=sprintf('%04X:%04X', $usbDevice['vendor'], $usbDevice['product'])?>">
                             <?=sprintf("%03d.%03d %04X:%04X %s", $usbDevice['bus'], $usbDevice['device'], $usbDevice['vendor'], $usbDevice['product'], $usbDevice['name'])?><br/>
 <?
 }
