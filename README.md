@@ -31,27 +31,27 @@ Tags are available to match VirtualBox version.
 
 - On Debian to minimum dependencies are:
 
-`
-sudo apt-get install build-essentials libxml2-dev virtualbox
-`
+  ```
+  sudo apt-get install build-essentials libxml2-dev virtualbox
+  ```
 
 - Download and unpack the "VirtualBox x.y.z Software Developer Kit (SDK)" matching the version installed:
 
-https://www.virtualbox.org/wiki/Downloads
+  https://www.virtualbox.org/wiki/Downloads
 
-Or here for older builds:
+  Or here for older builds:
 
-https://www.virtualbox.org/wiki/Download_Old_Builds
+  https://www.virtualbox.org/wiki/Download_Old_Builds
 
 - Compile the vboxxml native tool:
 
-`
-cd vboxxml
-make VBOX_PATH=/usr/lib/virtualbox XPCOM_PATH=/home/myuser/Downloads/sdk/bindings/xpcom
-sudo make VBOX_PATH=/usr/lib/virtualbox install
-`
+  ```
+  cd vboxxml
+  make VBOX_PATH=/usr/lib/virtualbox XPCOM_PATH=/home/myuser/Downloads/sdk/bindings/xpcom
+  sudo make VBOX_PATH=/usr/lib/virtualbox install
+  ```
 
-This will install VboxXML into Virtualbox's directory.
+  This will install VboxXML into Virtualbox's directory.
 
 - Deploy the web frontend located in www into a webserver and set options in include/config.inc.php
 
