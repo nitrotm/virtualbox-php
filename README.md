@@ -3,11 +3,12 @@
 This project provides a simple virtualbox frontend in php.
 
 The goal is to be able to control virtual machines for doing
-some quick deployments.
+some quick tests and deployments.
 
-The main logic is to have a set of machine templates that can be
+The main scenario is to have a set of machine templates that are
 quickly deployed using differential disk images, so it takes
-only a few seconds to setup a new machine and have it running.
+only a few seconds to setup a new guest machine and have it
+running.
 
 This is not meant for production or large scale deployment, but
 more as a headless controller for a shared VirtualBox host in a
@@ -51,9 +52,11 @@ Tags are available to match VirtualBox version.
   sudo make VBOX_PATH=/usr/lib/virtualbox install
   ```
 
-  This will install VboxXML into Virtualbox's directory.
+  This will install VboxXML into VirtualBox's directory.
 
 - Deploy the web frontend located in www into a webserver and set options in include/config.inc.php
+
+- Install the resources you need (like dvd/floppy/hdd images).
 
 
 ## License
