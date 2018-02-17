@@ -211,25 +211,41 @@ class Repository {
 
         self::$dvds = array();
         foreach ($dvds as $dvd) {
-            self::$dvds[$dvd->path] = $dvd;
+            if (file_exists($dvd->path)) {
+                self::$dvds[$dvd->path] = $dvd;
+            } else {
+                voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'closemedium', 'dvd', $dvd->id));
+            }
         }
         uasort(self::$dvds, array('Repository', 'sortByName'));
 
         self::$fdds = array();
         foreach ($fdds as $fdd) {
-            self::$fdds[$fdd->path] = $fdd;
+            if (file_exists($fdd->path)) {
+                self::$fdds[$fdd->path] = $fdd;
+            } else {
+                voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'closemedium', 'floppy', $fdd->id));
+            }
         }
         uasort(self::$fdds, array('Repository', 'sortByName'));
 
         self::$hdds = array();
         foreach ($hdds as $hdd) {
-            self::$hdds[$hdd->path] = $hdd;
+            if (file_exists($hdd->path)) {
+                self::$hdds[$hdd->path] = $hdd;
+            } else {
+                voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'closemedium', 'hdd', $hdd->id));
+            }
         }
         uasort(self::$hdds, array('Repository', 'sortByName'));
 
         self::$machines = array();
         foreach ($machines as $machine) {
-            self::$machines[$machine->id] = $machine;
+            if (file_exists($machine->path)) {
+                self::$machines[$machine->id] = $machine;
+            } else {
+                voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'unregistervm', $machine->id));
+            }
         }
         uasort(self::$machines, array('Repository', 'sortByName'));
 
