@@ -10,15 +10,16 @@ case 'create':
         $machine->set(
             array(
                 'cpus' => intParam('cpus', 1),
-                'memory' => intParam('memory', 512),
-                'vram' => intParam('vram', 12),
+                'memory' => intParam('memory', 1024),
+                'vram' => intParam('vram', 128),
                 'boot1' => 'floppy',
                 'boot2' => 'dvd',
                 'boot3' => 'disk',
                 'boot4' => 'none',
                 'vrde' => boolParam('vrde'),
                 'vrdeaddress' => stringParam('vrdeaddress', '0.0.0.0'),
-                'vrdeport' => intParam('vrdeport', 3389)
+                'vrdeport' => intParam('vrdeport', 3389),
+                'accelerate2dvideo' => TRUE
             )
         );
 
@@ -81,12 +82,40 @@ case 'create':
         }
 
         // set nic
+        $nicDriver = '82545EM';
+        switch ($machine->ostype) {
+        case 'Windows31':
+        case 'Windows95':
+        case 'Windows98':
+        case 'WindowsMe':
+        case 'WindowsNT4':
+        case 'WindowsXP':
+        case 'WindowsXP_64':
+            $nicDriver = 'Am79C973';
+            break;
+        }
         $machine->nic0 = array(
             'type' => 'bridged',
-            'driver' => '82545EM',
+            'driver' => $nicDriver,
             'adapter' => DEFAULT_NET_ADAPTER,
             'connected' => 'on'
         );
+
+        // set audio
+        $audioController = 'hda';
+        switch ($machine->ostype) {
+        case 'Windows31':
+        case 'Windows95':
+        case 'Windows98':
+        case 'WindowsMe':
+        case 'WindowsNT4':
+        case 'WindowsXP':
+        case 'WindowsXP_64':
+            $audioController = 'ac97';
+            break;
+        }
+        // $machine->audio = 'pulse';
+        $machine->audiocontroller = $audioController;
 
         header('Location: machine.php?machine='.$machine->id);
         exit;
@@ -219,11 +248,11 @@ foreach (Repository::listOses() as $os) {
                     </tr>
                     <tr>
                         <th>RAM</th>
-                        <td><input type="text" name="memory" value="<?=intParam('memory', 512)?>"/> [mb]</td>
+                        <td><input type="text" name="memory" value="<?=intParam('memory', 1024)?>"/> [mb]</td>
                     </tr>
                     <tr>
                         <th>VRAM</th>
-                        <td><input type="text" name="vram" value="<?=intParam('vram', 12)?>"/> [mb]</td>
+                        <td><input type="text" name="vram" value="<?=intParam('vram', 128)?>"/> [mb]</td>
                     </tr>
                     <tr>
                         <th>VRD</th>
