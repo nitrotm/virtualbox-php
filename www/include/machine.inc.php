@@ -207,7 +207,7 @@ class Machine extends AbstractObject {
         case 'nic6':
         case 'nic7':
             $i = substr($name, 3) + 1;
-            switch ($this->get('nic'.$i, 'none')) {
+            switch ($this->get('nic'.$i, 'null')) {
             case 'nat':
                 return array(
                     'type' => 'nat',
@@ -249,7 +249,7 @@ class Machine extends AbstractObject {
                 );
             }
             return array(
-                'type' => 'none',
+                'type' => 'null',
                 'connected' => 'off'
             );
 
@@ -654,7 +654,7 @@ class Machine extends AbstractObject {
             case 'nic7':
                 $i = substr($name, 3) + 1;
                 if (!isset($value['type'])) {
-                    $value['type'] = 'none';
+                    $value['type'] = 'null';
                 }
                 if (!isset($value['driver'])) {
                     $value['driver'] = 'Am79C973';
@@ -703,7 +703,7 @@ class Machine extends AbstractObject {
                     break;
 
                 default:
-                    if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'modifyvm', $this->id, '--nic'.$i, 'none')) == 0) {
+                    if (voidExec(VIRTUALBOX_MGT_BIN, array('-q', 'modifyvm', $this->id, '--nic'.$i, 'null')) == 0) {
                         $changed = TRUE;
                     }
                     break;

@@ -125,7 +125,7 @@ case 'set':
         // network
         foreach (arrayParam('net') as $net) {
             $machine->$net = array(
-                'type' => stringParam($net.'_type', 'none'),
+                'type' => stringParam($net.'_type', 'null'),
                 'driver' => stringParam($net.'_driver', '82543GC'),
                 'mac' => str_replace(':', '', stringParam($net.'_mac', 'auto')),
                 'adapter' => stringParam($net.'_adapter', FALSE),
@@ -574,7 +574,7 @@ for ($i = 0; $i < 30; $i++) {
 for ($i = 0; $i < 8; $i++) {
     $slot = 'nic'.$i;
     $nic = $machine->$slot;
-    if ($nic['type'] == 'none') {
+    if ($nic['type'] == 'null') {
         continue;
     }
 ?>
@@ -601,7 +601,7 @@ for ($i = 0; $i < 8; $i++) {
 ?>
                             type: <select name="<?=$slot?>_type">
 <?php
-        foreach (array('bridged' => 'Bridged', 'hostonly' => 'Host-only') as $key => $value) {
+        foreach (array('bridged' => 'Bridged', 'hostonly' => 'Host-only', 'null' => 'None') as $key => $value) {
             if ($key == $nic['type']) {
                 ?><option value="<?=$key?>" selected=""><?=$value?></option><?php
             } else {
