@@ -42,12 +42,21 @@ function readMemoryInfo() {
 }
 
 function readHddInfo() {
-    $hdd = array();
-    foreach (simpleExec('/bin/df', array('-lk', '/')) as $line) {
-        $matches = preg_split("/\s+/", $line);
-        if (sizeof($matches) == 6) {
-            $hdd['size'] = intval($matches[1]) / 1024.0;
-            $hdd['used'] = intval($matches[2]) / 1024.0;
+    $hdd = array(
+        'size' => 0,
+        'used' => 0
+    );
+    foreach (simpleExec('/bin/findmnt', array('-n', '-o', 'SOURCE', '--target', BASE_PATH)) as $line) {
+        $path = trim($line);
+        if (strlen($path) == 0) {
+            continue;
+        }
+        foreach (simpleExec('/bin/df', array('-lk', $path)) as $line) {
+            $matches = preg_split("/\s+/", $line);
+            if (sizeof($matches) == 6) {
+                $hdd['size'] += intval($matches[1]) / 1024.0;
+                $hdd['used'] += intval($matches[2]) / 1024.0;
+            }
         }
     }
     return $hdd;
