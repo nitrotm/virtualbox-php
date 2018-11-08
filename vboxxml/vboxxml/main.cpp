@@ -97,7 +97,7 @@ static void registerMachines(IVirtualBox *virtualBox, const string &path) {
 /**
  * Register resources
  */
-static int registerResources(IVirtualBox *virtualBox, const Parameters &parameters) {
+static void registerResources(IVirtualBox *virtualBox, const Parameters &parameters) {
     // register mediums
     if (parameters.systemPath.length() > 0) {
         registerMediums(virtualBox, parameters.systemPath + "/additions", ".iso", DeviceType_DVD, AccessMode_ReadOnly, MediumType_Readonly, true);
