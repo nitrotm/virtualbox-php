@@ -181,7 +181,7 @@ class Repository {
             return FALSE;
         }
 
-        $lines = simpleExec(VIRTUALBOX_MGT_BIN, array('-q', 'import', $path));
+        $lines = simpleExec(VIRTUALBOX_MGT_BIN, array('-q', 'import', $path, '--options', 'importtovdi'));
         foreach ($lines as $line) {
             if (preg_match('/^UUID: ([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$/', $line, $matches)) {
                 return self::getMachine($matches[1]);
