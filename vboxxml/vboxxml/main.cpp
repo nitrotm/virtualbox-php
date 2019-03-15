@@ -102,9 +102,18 @@ static void registerResources(IVirtualBox *virtualBox, const Parameters &paramet
     if (parameters.systemPath.length() > 0) {
         registerMediums(virtualBox, parameters.systemPath + "/additions", ".iso", DeviceType_DVD, AccessMode_ReadOnly, MediumType_Readonly, true);
     }
+    registerMediums(virtualBox, parameters.basePath + "/dvd", ".dmg", DeviceType_DVD, AccessMode_ReadOnly, MediumType_Readonly, true);
     registerMediums(virtualBox, parameters.basePath + "/dvd", ".iso", DeviceType_DVD, AccessMode_ReadOnly, MediumType_Readonly, true);
+    registerMediums(virtualBox, parameters.basePath + "/dvd", ".cdr", DeviceType_DVD, AccessMode_ReadOnly, MediumType_Readonly, true);
+    registerMediums(virtualBox, parameters.basePath + "/dvd", ".cue", DeviceType_DVD, AccessMode_ReadOnly, MediumType_Readonly, true);
+    registerMediums(virtualBox, parameters.basePath + "/fdd", ".ima", DeviceType_Floppy, AccessMode_ReadOnly, MediumType_Readonly, true);
     registerMediums(virtualBox, parameters.basePath + "/fdd", ".img", DeviceType_Floppy, AccessMode_ReadOnly, MediumType_Readonly, true);
+    registerMediums(virtualBox, parameters.basePath + "/fdd", ".dsk", DeviceType_Floppy, AccessMode_ReadOnly, MediumType_Readonly, true);
+    registerMediums(virtualBox, parameters.basePath + "/fdd", ".flp", DeviceType_Floppy, AccessMode_ReadOnly, MediumType_Readonly, true);
+    registerMediums(virtualBox, parameters.basePath + "/fdd", ".vfd", DeviceType_Floppy, AccessMode_ReadOnly, MediumType_Readonly, true);
     registerMediums(virtualBox, parameters.basePath + "/hdd", ".vdi", DeviceType_HardDisk, AccessMode_ReadOnly, MediumType_MultiAttach, true);
+    registerMediums(virtualBox, parameters.basePath + "/hdd", ".vhd", DeviceType_HardDisk, AccessMode_ReadOnly, MediumType_MultiAttach, true);
+    registerMediums(virtualBox, parameters.basePath + "/hdd", ".vmdk", DeviceType_HardDisk, AccessMode_ReadOnly, MediumType_MultiAttach, true);
 
     // register machines (with hdds)
     registerMediums(virtualBox, parameters.basePath, ".vdi", DeviceType_HardDisk, AccessMode_ReadOnly, MediumType_Normal, false);
